@@ -1,9 +1,229 @@
 ---
-title: 'Purely Functional Python'
+title: 'Tic-Tac-Toe in 1 Line of Python'
 description: 'Building up to tic-tac-toe in one line of purely functional Python.'
-date: 2025-09-27
+date: 2026-02-08
 tags: ['programming']
 image: './purely-functional-python.svg'
 previewImage: './functional_python_preview.webp'
 authors: ['Ryan Batubara']
 ---
+
+# Haskell Déjà vu
+
+A while back I decided to learn [Haskell](https://www.haskell.org/), since [functional programming](https://en.wikipedia.org/wiki/Functional_programming) _looked_ cool. For example, here is Quicksort in Haskell, taken from these [fantastic lectures](https://ucsd-cse230-np.github.io/web/lectures.html):
+
+```haskell
+sort []     = []
+sort (x:xs) = sort ls ++ [x] ++ sort rs
+  where
+    ls      = [ l | l <- xs, l <= x ]
+    rs      = [ r | r <- xs, x <  r ]
+```
+
+Learning Haskell also gave me a sense of déjà vu back to when I first saw list comprehensions and lambda functions in Python:
+
+```python
+quicksort = lambda arr:
+    arr if len(arr) <= 1
+    else quicksort([x for x in arr[1:] if x <= arr[0]]) + [arr[0]]
+       + quicksort([x for x in arr[1:] if x > arr[0]])
+```
+
+Sure, the above code used a lot of things a pure lambda calculus would never use. But this got me thinking -- just how far can you go with functional Python?
+
+# Building up to "Tic-Tac-Toe"
+
+At around the same time, I was taking part in a series of coding challenges. That week's challenge was to implement tic-tac-toe in Python with one additional feature. I decided to [code golf](https://en.wikipedia.org/wiki/Code_golf) it and implement it in one line of Python.
+
+## Setting some ground rules
+
+Originally, I wanted to _only_ use functions, and use encodings like the ones below to get things like `if` statements:
+
+```python
+True = lambda x,y: x
+False = lambda x,y: y
+Ife = lambda b,x,y: b(x,y)
+```
+
+However, I soon realized just how painful this would be. Indeed, Haskell, which is often referred to as a purely functional language, abstracts these details away. The book [A Gentle Introduction to Haskell](https://www.haskell.org/tutorial/goodies.html) states
+
+> Because Haskell is a purely functional language, all computations are done via the evaluation of expressions (syntactic terms) to yield values (abstract entities that we regard as answers). Examples of expressions include atomic values such as the integer 5, the character 'a', and the function \x -> x+1, as well as structured values such as the list [1,2,3] and the pair ('b',4).
+
+Thus, I'm going to allow myself usage of atomic types, strings, lists, and tuples, alongside functions. I'll also allow `for{:python}` if its in the form of a list comprehension.
+
+## Evaluating expressions
+
+The biggest hurdle now is that there's no clear way to _run_ this cursed code. That is, suppose I write in the Python repl
+
+```python frame="terminal"
+>>> lambda _:'Hello World'
+<function <lambda> at 0x102d1f520>
+```
+
+How can I evaluate such a function? Sure, there's the obvious
+
+```python frame="terminal"
+>>> a = lambda _:'Hello World'
+>>> a(_)
+'Hello World'
+```
+
+But this takes two lines. Instead, we can pass it into another function and call it that way:
+
+```python frame="terminal"
+>>> (lambda _:_(_)) (lambda _:'Hello World')
+'Hello World'
+```
+
+Let's take a moment to digest what `(lambda _:_(_)) (lambda _:'Hello World'){:python}` means.
+
+First `lambda _:_(_){:python}` is a function, that given an input function, will call said input function on itself. So `a = lambda _:_(_){:python}` is equivalent to
+
+```python 
+def a(f):
+    return f(f)
+```
+
+I think of this as a baseless, pseudo-recursion. Indeed,
+
+```python frame="terminal"
+>>> a = lambda _:_(_)
+>>> a(a)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 1, in <lambda>
+  File "<stdin>", line 1, in <lambda>
+  File "<stdin>", line 1, in <lambda>
+  [Previous line repeated 996 more times]
+RecursionError: maximum recursion depth exceeded
+```
+
+As such
+
+```python frame="terminal"
+>>> (lambda _:_(_))(print("Hello World"))
+Hello World
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 1, in <lambda>
+TypeError: 'NoneType' object is not callable
+```
+
+because `print(){:python}` in Python returns `None{:python}` and you cannot call `None(){:python}`. However
+
+```python frame="terminal"
+>>> (lambda _:_(_))(lambda _:print("Hello World"))
+Hello World
+```
+
+works without issue. This is because the second `lambda{:python}` is callable and ignores its input, so evaluating it calls `print("Hello World"){:python}` and then stops.
+
+## If statements
+
+If statements can be done in one line using `and{:python}` and `or{:python}`. The syntax is roughly
+
+```python
+(condition) and \
+    (then statement) \
+or (else statement)
+```
+
+If `(condition)` is true, `and{:python}` will attempt to evaluate the `(then statement)`, including executing `print(){:python}`. 
+
+If `(condition)` is false, `and{:python}` will [short-circuit](https://en.wikipedia.org/wiki/Short-circuit_evaluation), skipping `(then statement)`. The `and{:python}` will return false. Afterwards, `or{:python}` will evaluate `(else statement)`.
+
+## Variables
+
+Python 3.8 introduces the [assignment expression](https://peps.python.org/pep-0572/) `:=`. With this, I can define local variables with
+
+```python
+(var name) := (var value),
+(expression)
+```
+
+## Modifying data structures
+
+Given a list `lst`, we can change the value of index `i` by creating a new list:
+
+```python
+lst[:i] + [(new value)] + lst[i+1:]
+```
+
+This new list can be named as a variable or passed into another function. Unfortunately, this does allocate a whole new list in memory.
+
+# Tic-Tac-Toe in one line
+
+As the previous `lambda _:_(_){:python}` also functions as a loop, we actually have everything we need to assemble tic-tac-toe in one line of Python:
+
+```python showLineNumbers=false
+(lambda f: f(f))(lambda f, w=int(input("Input the size of the board: ")):(lambda game:game(game, ['   '] * (w * w), 0))(lambda game, b, t: (print('\n' + '\n'.join(['|' + '|'.join(b[i * w:(i + 1) * w]) + '|' for i in range(w)]) + '\n'), (any([all(s == b[i * w] != '   ' for s in b[i * w:(i + 1) * w]) for i in range(w)] + [all(s == b[i] != '   ' for s in b[i::w]) for i in range(w)] + [all(b[i * (w + 1)] == b[0] != '   ' for i in range(w))] + [all(b[(i + 1) * (w - 1)] == b[w - 1] != '   ' for i in range(w))]) and (print(f"Player {['X', 'O'][(t - 1) % 2]} wins!") or 1)) or (t == w * w and (print("It's a tie!") or 1)) or ((p := [' X ', ' O '][t % 2], i := int(input(f'Player {p}, choose 0-{w * w - 1}: ')), b[i] == '   ' and game(game, b[:i] + [p] + b[i + 1:], t + 1)) or (print('Invalid move!'), game(game, b, t))))))
+```
+
+Here's the code with indents, comments, and [escape characters](https://www.w3schools.com/python/gloss_python_escape_characters.asp):
+
+```python
+# Self-application trick from above
+(lambda f: f(f)\
+# Read board size and create recursive board function
+)(lambda f, w=int(input("Input the size of the board: ")):\
+    # Define a game loop and call it with an empty w*w board and t=0 turns.
+    (lambda game:game(game, ['   '] * (w * w), 0))\
+    # The recursive game loop
+    (lambda game, b, t: \
+        # Print the board as w rows, with columns separated by "|"
+        (print(\
+            '\n' \
+            + '\n'.join(['|' + '|'.join(b[i * w:(i + 1) * w]) \
+            + '|' for i in range(w)]) \
+            + '\n'), \
+        (\
+            # Check the win condition
+            any(\
+                # Check if any row is not empty and all equal
+                [all(s == b[i * w] != '   ' for s in b[i * w:(i + 1) * w]) for i in range(w)] \
+                # Check if any column is not empty and all equal
+                + [all(s == b[i] != '   ' for s in b[i::w]) for i in range(w)] \
+                # Check if the diagonal is not empty and all equal
+                + [all(b[i * (w + 1)] == b[0] != '   ' for i in range(w))] \
+                # Check if the anti-diagonal is not empty and all equal
+                + [all(b[(i + 1) * (w - 1)] == b[w - 1] != '   ' for i in range(w))] \
+            # If any win condition above is true, 
+            #   then evaluate the print below
+            #   else continue and do not evaluate the print
+            ) and (\
+                print(f"Player {['X', 'O'][(t - 1) % 2]} wins!") or 1 \
+            )\
+        )\
+        # If no win, check for tie:
+        or (\
+            # If t turns have passed
+            t == w * w \
+            # then evaluate the print expression
+            and (print("It's a tie!") \
+            # else evaluate true and move on
+            or 1) \
+        )\
+        # If no win nor tie, take a move
+        or (
+            (\
+            # Define p as current player's mark
+            p := [' X ', ' O '][t % 2], \
+            # Define i as the index player wants to write to
+            i := int(input(f'Player {p}, choose 0-{w * w - 1}: ')), \
+            # If the input is valid and cell is empty
+            0 <= i < w*w and b[i] == '   ' \
+            #   then recurse with the updated board
+            and game(game, b[:i] + [p] + b[i + 1:], t + 1) \
+            )\
+            #   else print error and recurse without changing state
+            or (print('Invalid move!'), game(game, b, t) \
+        )))\
+    )\
+)
+```
+
+# Reflections
+
+Honestly, outside of challenges, no one should implement recursion, expressions, if statements, and variables in the way we have done above, both for its bad (memory) performance and readability reasons.
+
+That said, I had fun putting together the above game. I hope you enjoyed this little code golfing journey too.
