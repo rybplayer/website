@@ -1,0 +1,45 @@
+{
+  "updatedAt": "2026-02-09T09:43:22.454Z",
+  "items": [
+    {
+      "slug": "The Math of Guitar",
+      "description": "Which can produce a note of higher frequency, a guitar or piano? In this talk, we explore the basics of the guitar fret board, and why each string and fret produces the note it does. We then focus on harmonics, presenting a wide variety of musical applications for the natural harmonic series.",
+      "title": "The Math of Guitar",
+      "githubUrl": "https://github.com/rybplayer/Talks/tree/main/The%20Math%20of%20Guitar",
+      "previewImage": "TalkGuitarHarmonics.webp",
+      "date": "2026-01-27T18:25:58Z"
+    },
+    {
+      "slug": "Logic Grids as Data Structures",
+      "description": "Logic grids are a fun way to organize information in a variety of logic puzzles. Interestingly, they are solvable and explainable in polynomial time, given some restrictions. In this talk, we explore said restrictions. In particular, what can we do if some of the clues may be lying to us?",
+      "title": "Logic Grids as Data Structures",
+      "githubUrl": "https://github.com/rybplayer/Talks/tree/main/Logic%20Grids%20as%20Data%20Structures",
+      "previewImage": "TalkLogicGrids.webp",
+      "date": "2025-06-02T17:19:48Z"
+    },
+    {
+      "slug": "Intro to Quantum Computing",
+      "description": "This talk serves as a brief introduction to quantum computing, aimed at undergraduates with a background in math. The talk builds up to quantum teleportation and superdense coding, and some miscellaneous applications of quantum computing theory afterwards.",
+      "title": "Intro to Quantum Computing",
+      "githubUrl": "https://github.com/rybplayer/Talks/tree/main/Intro%20to%20Quantum%20Computing",
+      "previewImage": "TalkQuantum.webp",
+      "date": "2025-01-26T07:59:06Z"
+    },
+    {
+      "slug": "History of Math Puzzles",
+      "description": "Would you consider finding the roots of a quadratic a math puzzle? How about the Babylonians? This talk briefly explores the development of recreational math over time, and how it often reflects the mathematical tools and beliefs of the time.",
+      "title": "History of Math Puzzles",
+      "githubUrl": "https://github.com/rybplayer/Talks/tree/main/History%20of%20Math%20Puzzles",
+      "previewImage": "TalkPuzzleHistory.webp",
+      "date": "2024-10-16T17:27:06Z"
+    },
+    {
+      "slug": "Mathematics of Origami",
+      "description": "It is well-known that you cannot trisect an angle using just a ruler and a compass. Interestingly, you can trisect angles, divide lengths, and even compute by folding paper! This talk explores some of the mathematical and practical applications of Origami.",
+      "title": "Mathematics of Origami",
+      "githubUrl": "https://github.com/rybplayer/Talks/tree/main/Mathematics%20of%20Origami",
+      "previewImage": "TalkOrigami.webp",
+      "date": "2024-10-16T17:27:06Z"
+    }
+  ]
+}
