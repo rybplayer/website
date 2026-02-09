@@ -1,22 +1,21 @@
 ---
 import PageHead from '@/components/PageHead.astro'
-// import ProjectCard from '@/components/ProjectCard.astro'
+import ResourceCard from '@/components/ResourceCard.astro'
 import Layout from '@/layouts/Layout.astro'
-// import { getAllProjects } from '@/lib/data-utils'
+import { getAllResources } from '@/lib/data-utils'
 
-// const talks = await getAllTalks()
+const resources = await getAllResources()
 ---
 
 <Layout class="max-w-3xl">
-  <PageHead slot="head" title="Projects" />
+  <PageHead slot="head" title="Resources" />
 
   <section>
     <div class="min-w-full">
       <h2 class="mb-4 text-2xl font-medium">Resources</h2>
-      <!-- <div class="flex flex-col gap-4">
-        {projects.map((project) => <ProjectCard project={project} />)}
-      </div> -->
-      Under construction!
+      <div class="flex flex-col gap-4">
+        {resources.map((resource) => <ResourceCard resource={resource} />)}
+      </div>
     </div>
   </section>
 </Layout>

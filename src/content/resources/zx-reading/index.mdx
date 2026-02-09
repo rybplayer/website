@@ -1,0 +1,79 @@
+---
+title: 'Quantum ZX Calculus Reading Group'
+description: 'Digital flyer for the ZX Calculus Reading Group SP26.'
+date: 2026-08-03
+tags: []
+image: ''
+previewImage: ''
+authors: ['Ryan Batubara']
+---
+
+# Welcome
+
+**Text**: [Picturing Quantum Software](https://zxcalc.github.io/book/) (PQS) by Aleks Kissinger and John van de Wetering. A free [pdf](https://github.com/zxcalc/book/releases/latest/download/pqs-bw.pdf) and [html](https://zxcalc.github.io/book/html/main_html.html) are provided by the authors through [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). Note that we will use the black and white version for accessibility reasons.
+
+**Topics**: ZX Calculus, quantum simulation, quantum compilers.
+
+**Prerequisites**: Some prior quantum computing background will be assumed (at the level of Prof. Grier's [CSE 190 / MATH 152](https://www.danielgrier.com/courses/CSE190/Sp25/)), but is not strictly necessary. Those without background are strongly encouraged to enroll in the CSE 190 / MATH 152 offering in Spring 2026. Explicitly, we will assume knowledge of
+1. quantum circuits,
+2. basic algorithms: quantum teleportation, Deutsch-Jozsa, Grover's, Shor's, etc.,
+3. basic complexity theory,
+4. Python programming, and
+5. some [mathematical maturity](https://en.wikipedia.org/wiki/Mathematical_maturity).
+
+**Time**: 2 hour in-person sessions weekly, on weeks 1-9 of Spring 2026. \
+Specific meeting time TBD by when2meet after interest form closes. 
+
+**Interest form**: TBD. Will be released in week 6 and due end of week 8, Winter 2026. \
+**Communication**: Discord server link will be sent upon interest form submission.
+
+**Credit**: I will try really hard for 2 units of Math 199 P/NP. If we do get it, you need to attend 6/9 sessions and submit a project to pass.
+
+## Purpose
+
+**Why these topics?** A major focus of this reading group is to explore quantum theory and compilers through the lens of the ZX calculus. ZX itself is a _new_ graphical way to represent quantum circuits, with surprisingly powerful implications for compilers, classical simulation, and general quantum computing intuition.
+
+**Why this book?** _Picturing Quantum Software_ (PQS) is the ``graduate'' version of _Picturing Quantum Processes_ (PQP), a slower-paced, ZX-calculus intro book without applications to compilation. Depending on who is interested, we may move to PQP instead of PQS, and change material accordingly. Both are excellent books with lots of examples, exercises, and an excellent "Summary" section at the end of every chapter.
+
+**Who is this for?** This reading group is primarily designed for undergraduates with prior quantum computing background and an interest in more advanced quantum topics and/or quantum simulation and/or quantum compilers. This reading group will focus on the key results ZX calculus delivers for these topics. Because of this, we will focus on the results, skipping their proofs in the book.
+
+## Syllabus
+
+**Meeting structure**: Every week, a reading and some exercises will be shared. In the meeting, some group of people will review the reading for 30 minutes, another group will discuss 1-2 exercises for 30 minutes, and another group will do a live code demo for 30 minutes. The rest is buffer time.
+
+All participants are strongly encouraged to sign up to host the review, present solutions to exercises, or host the coding session. This may be done in groups, and you may sign up as many times as you like. Sign-ups will be through Discord.
+
+**Outline**: The reading column indicates the book chapters that should be read _before_ said meeting. The intention is to make each meeting as self-contained as possible. In other words, if you miss a meeting, you should be able to skim the "Summary" section of the previous chapters and still follow along.
+
+| Week | Topic                                 | PQS Reading    |
+| ---- | ------------------------------------- | -------------- |
+| 1    | Motivations, intro to ZX calculus     | 3.1 - 3.2      |
+| 2    | Intro to ZX calculus, part 2          | 3.3 - 3.6      |
+| 3    | Phase-free ZX calculus                | 4.1 - 4.5      |
+| 4    | Clifford circuits                     | 5.1 - 5.3, 5.6 |
+| 5    | Stabiliser theory, simulation         | 6.1 - 6.3, 6.6 |
+| 6    | Measurement-based quantum computation | 9              |
+| 7    | Optimizing Toffoli gates              | 10.4 - 10.6    |
+| 8    | T-count optimization                  | 11.2 - 11.4    |
+| 9    | Project presentations                 |                |
+
+If we get credit, you must attend 6/9 sessions to pass.
+
+## Learning Outcomes
+
+By the end of the reading group, we aim to be able to answer the following questions in detail:
+
+1. **ZX-calculus**: What is the ZX calculus? What are the rules of the ZX calculus? Why should we care? How do we write ZX in software?
+2. **Clifford circuits**: What is a Clifford circuit? How do we represent them as tableaus in Python? How do we represent them in ZX?
+3. **T-gate optimization** What is quantum compilation? Why do we care about the number of T gates? How does ZX-calculus help with this?
+4. **Measurement-based quantum computation (MBQC)**: What is MBQC? How do we represent it in ZX? What is a graph state? Why does this matter?
+
+## Projects
+
+The end goal for the reading group is to produce some project using ZX calculus or corresponding software. The ZX calculus theory and software ecosystem is quite young, so there is a lot of room to implement something very simple yet new.
+
+For example, a proof of some quantum algorithm and its compilation using ZX-calculus is more than sufficient as a project. If we get credit, you must submit a project to pass.
+
+## Thank you!
+
+Thank you for having some interest in this reading group. I am very new to quantum computing and reading groups, so any advice / feedback / ideas are appreciated. Feel free to email me at rbatubara [at] ucsd [dot] edu.

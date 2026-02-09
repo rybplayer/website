@@ -1,0 +1,66 @@
+---
+import Link from '@/components/Link.astro'
+import { Badge } from '@/components/ui/badge'
+import { cardVariants } from '@/lib/card-variants'
+import { cn } from '@/lib/utils'
+import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
+
+interface Props {
+  resource: CollectionEntry<'resources'>
+  disableHover?: boolean
+}
+
+const { resource, disableHover = false } = Astro.props
+const bodyText = resource.body?.trim() ?? ''
+const externalLink = resource.data.link
+const hasExternalLink = !!externalLink && bodyText.length === 0
+const href =
+  hasExternalLink && externalLink ? externalLink : `/resources/${resource.id}`
+---
+
+<div
+  class={cn(
+    cardVariants({
+      variant: 'default',
+      hover: disableHover ? 'disabled' : 'enabled',
+    }),
+  )}
+>
+  <Link
+    href={href}
+    class="flex flex-col gap-4 sm:flex-row"
+    external={hasExternalLink}
+  >
+    {
+      resource.data.image && (
+        <div class="w-full border sm:max-w-3xs sm:shrink-0">
+          <Image
+            src={resource.data.image}
+            alt={resource.data.title}
+            width={1200}
+            widths={[128, 256, 512]}
+            height={630}
+            class="object-cover"
+          />
+        </div>
+      )
+    }
+    <div class="grow">
+      <h3 class="mb-1 text-lg font-semibold">{resource.data.title}</h3>
+      <p class="text-muted-foreground mb-2 text-sm">
+        {resource.data.description}
+      </p>
+      {
+        resource.data.tags && (
+          <div class="flex flex-wrap gap-2">
+            {resource.data.tags.map((tag: string) => (
+              <Badge variant="secondary">{tag}</Badge>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </Link>
+</div>
+
