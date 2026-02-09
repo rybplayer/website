@@ -5,12 +5,19 @@ import { getParentId, isSubpost } from '@/lib/data-utils'
 import { cn, getHeadingMargin } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 
-type Props = {
+interface Props {
   sections: TOCSection[]
   currentPostId: string
+  basePath?: string
+  subitemsLabel?: string
 }
 
-const { sections, currentPostId } = Astro.props
+const {
+  sections,
+  currentPostId,
+  basePath = '/blog',
+  subitemsLabel = 'Subposts',
+} = Astro.props
 const isCurrentSubpost = isSubpost(currentPostId)
 const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
 ---
@@ -30,9 +37,10 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
         <div class="flex flex-col gap-2 px-4">
           <span class="text-lg font-medium">Table of Contents</span>
           {sections.map((section, index) => {
+            const previousSection = index > 0 ? sections[index - 1] : null
             const isFirstSubpost =
               section.type === 'subpost' &&
-              (index === 0 || sections[index - 1].type === 'parent')
+              (index === 0 || previousSection?.type === 'parent')
 
             return (
               <>
@@ -40,7 +48,7 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
                   <div class="mt-2 flex items-center gap-2">
                     <div class="bg-border h-px flex-1" />
                     <span class="text-muted-foreground text-xs font-medium">
-                      Subposts
+                      {subitemsLabel}
                     </span>
                     <div class="bg-border h-px flex-1" />
                   </div>
@@ -61,7 +69,7 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
                         <a
                           href={
                             isCurrentSubpost
-                              ? `/blog/${parentId}#${heading.slug}`
+                              ? `${basePath}/${parentId}#${heading.slug}`
                               : `#${heading.slug}`
                           }
                           class="marker:text-foreground/30 list-none underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
@@ -92,7 +100,7 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
                           href={
                             section.subpostId === currentPostId
                               ? '#'
-                              : `/blog/${section.subpostId}`
+                              : `${basePath}/${section.subpostId}`
                           }
                           class="marker:text-foreground/30 inline-flex list-none items-center gap-1 underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
                           data-heading-link={

@@ -1,15 +1,18 @@
 ---
 import { SITE } from '@/consts'
-import { getParentPost, isSubpost } from '@/lib/data-utils'
+import { getParentPost, isSubpost, type ContentCollection } from '@/lib/data-utils'
 import type { CollectionEntry } from 'astro:content'
 
 interface Props {
-  post: CollectionEntry<'blog'>
+  post: CollectionEntry<ContentCollection>
+  collection?: ContentCollection
 }
 
-const { post } = Astro.props
+const { post, collection = 'blog' } = Astro.props
 
-const parentPost = isSubpost(post.id) ? await getParentPost(post.id) : null
+const parentPost = isSubpost(post.id)
+  ? await getParentPost(post.id, collection)
+  : null
 
 const title = post.data.title || SITE.title
 const description =
