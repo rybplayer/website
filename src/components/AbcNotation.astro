@@ -1,46 +1,56 @@
 ---
 const {
   abc,
-  instrument = 'guitar',
+  instrument = "guitar",
   staffWidth = 270,
   minWidthPx = 200,
   maxWidthPx = 600,
-  maxWidthPercent = '50',
+  maxWidthPercent = "50",
   tuning = '["E,", "A,", "D", "G", "B", "e"]',
 } = Astro.props
 ---
 
 <div
   class="abc-wrapper"
-  style={`width: clamp(${minWidthPx}px, ${parseInt(maxWidthPercent)}%, ${maxWidthPx}px); margin: 0 auto;`}
+  style={`--abc-min:${minWidthPx}px;--abc-preferred:${parseInt(maxWidthPercent)}%;--abc-max:${maxWidthPx}px`}
 >
   <abc-notation
     data-abc={abc}
     data-instrument={instrument}
     data-staffwidth={staffWidth}
-    data-tuning={tuning}></abc-notation>
+    data-tuning={tuning}
+  ></abc-notation>
 </div>
 
+<style>
+  .abc-wrapper {
+    inline-size: clamp(var(--abc-min), var(--abc-preferred), var(--abc-max));
+    max-inline-size: 100%;
+    margin-inline: auto;
+    overflow-x: auto;
+  }
+</style>
+
 <script>
-  import abcjs from 'abcjs'
+  import abcjs from "abcjs"
 
   class AbcNotation extends HTMLElement {
     connectedCallback() {
-      const abc = this.dataset.abc || ''
+      const abc = this.dataset.abc || ""
       const instrument = this.dataset.instrument
-      const staffWidth = parseInt(this.dataset.staffwidth || '150')
-      const tuning = JSON.parse(this.dataset.tuning || '[]')
+      const staffWidth = parseInt(this.dataset.staffwidth || "150")
+      const tuning = JSON.parse(this.dataset.tuning || "[]")
       const options: any = {
-        selectionColor: 'default',
-        responsive: 'resize',
+        selectionColor: "default",
+        responsive: "resize",
         expandToWidest: true,
         staffwidth: staffWidth,
       }
 
-      if (instrument === 'guitar') {
+      if (instrument === "guitar") {
         options.tablature = [
           {
-            instrument: 'guitar',
+            instrument: "guitar",
             tuning: tuning,
           },
         ]
@@ -50,5 +60,6 @@ const {
     }
   }
 
-  customElements.define('abc-notation', AbcNotation)
+  if (!customElements.get("abc-notation"))
+    customElements.define("abc-notation", AbcNotation)
 </script>

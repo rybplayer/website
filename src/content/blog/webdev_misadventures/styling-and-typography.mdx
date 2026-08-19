@@ -3,8 +3,7 @@ title: 'Styling and Typography'
 description: 'Colors, fonts, and more. The fancy stuff.'
 date: 2025-12-22
 tags: ['programming']
-authors: ['Ryan Batubara']
-icon: 'lucide:brush'
+authors: ['ryan-batubara']
 ---
 
 import Spoiler from '@/components/Spoiler.astro'
@@ -16,8 +15,8 @@ import Banner from './webdev-misadventures.svg'
 
 I spent more time thinking about the site's color palette than any other design decision. This was largely because I wanted a palette that:
 
-1. Had a <span className="text-primary font-bold">primary color</span> that was visible in both light and dark mode.
-2. Had a <span className="text-primary font-bold">primary color</span> with <span className="text-muted font-bold">many</span> <span className="text-accent font-bold">subtle</span> <span className="text-secondary font-bold">shades</span>, making light and dark mode palettes easy.
+1. Had a <strong class="demo-primary">primary color</strong> that was visible in both light and dark mode.
+2. Had a <strong class="demo-primary">primary color</strong> with <strong class="demo-muted">many</strong> <strong class="demo-accent">subtle</strong> <strong class="demo-secondary">shades</strong>, making light and dark mode palettes easy.
 3. Had a wide available [color gamut](https://en.wikipedia.org/wiki/Gamut) on most displays.
 
 I did this by [experimenting](https://oklch.com/#0.5,0.1,130,100) with [`okclh(L C H / a)`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/oklch), which controls
@@ -31,7 +30,7 @@ To create a cohesive palette, I wanted all colors to have the same hue color. Fu
 
 I'm still working on this, but here's what I got so far:
 
-<div className="space-y-4">
+<div class="swatch-stack">
   <ColorSwatches theme="light" />
   <ColorSwatches theme="dark" />
 </div>
@@ -42,16 +41,16 @@ Black and white images are automatically inverted on light/dark mode though CSS'
 
 Post banners get special treatment. The art, text, and watermark are stored as an svg with transparent background. Between light and dark mode, I just swap out the background color. Here's what the banner looks like on both themes:
 
-<div class="not-prose xs:flex-row xs:justify-between flex flex-col items-center gap-4">
+<div class="banner-comparison">
   <img
     src={Banner.src}
     alt="Banner art on light background"
-    class="xs:w-[48%] w-full bg-[var(--banner-light)]"
+    class="banner-light"
   />
   <img
     src={Banner.src}
     alt="Banner art on dark background"
-    class="xs:w-[48%] w-full bg-[var(--banner-dark)]"
+    class="banner-dark"
   />
 </div>
 
@@ -59,7 +58,7 @@ Unfortunately, open graph previews don't work well with this. So I supply the sa
 
 ## Styling text
 
-Almost all [Markdown](https://www.markdownguide.org/) syntax is built-in. This includes **bold**, _italics_, $\text{equations}$, and `code`. Inline code highlighting is done by [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code). Spoiler tags like <Spoiler>this</Spoiler> are custom inline components.
+Almost all [Markdown](https://www.markdownguide.org/) syntax is built-in. This includes **bold**, _italics_, $\text{equations}$, and `code`. Satteri feeds both inline and block code into a shared [Expressive Code](https://expressive-code.com/) renderer. Spoiler tags like <Spoiler>this</Spoiler> are custom inline components.
 
 Sections are done with `#`, `##`, and so on. Tables are just like markdown:
 
@@ -88,17 +87,17 @@ function demo() {
 }
 ```
 
-Big thanks to [Erudite](https://astro-erudite.vercel.app/blog/rehype-patch) for making [Expressive Code](https://expressive-code.com/) work with [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code). Both packages are essential as Expressive Code doesn't decorate inline code but rehype-pretty-code's code blocks aren't as customizable as Expressive Code's.
+The shared renderer keeps inline annotations and full code blocks visually consistent without a second rehype pipeline or a package patch.
 
 ## Typography
 
-The current default font is [Inter](https://fonts.google.com/specimen/Inter) and the `mono` font is [Geist Mono](https://fonts.google.com/specimen/Geist+Mono). I like how modern and readable these fonts are. They're also [variable fonts](https://en.wikipedia.org/wiki/Variable_font).
+The current default fonts are the variable [IBM Plex Sans and Mono](https://www.ibm.com/plex/). They keep the modern, readable character of the original design while fitting the native CSS typography system.
 
 [Serif](https://en.wikipedia.org/wiki/Serif) vs [sans-serif](https://en.wikipedia.org/wiki/Sans-serif) was an unexpected point of contention in this website's design. Half of the people I asked feedback from preferred sans-serif, because it looks modern and clean. The other half argued serif was more academic and better suited my purposes.
 
 Here's a screenshot of an old version of the site with serif font:
 
-<img src={Serif.src} class="w-full max-w-md"></img>
+<img src={Serif.src} class="content-illustration" style="--content-max: 28rem"></img>
 
 Honestly, I thought it looked disgusting and too much like the default font.
 

@@ -1,0 +1,280 @@
+---
+type Categories = [string, string[]][]
+type Props = {
+  categories: Categories
+  id?: string
+  cellSize?: number
+  values?: string[]
+}
+
+const { categories, id, cellSize = 25, values } = Astro.props
+const keys = categories.map(([key]) => key)
+const groups = new Map(categories)
+const columnCategories = keys.slice(0, -1)
+const rowCategories = keys.slice(1).reverse()
+const columns = columnCategories.flatMap((category) =>
+  (groups.get(category) ?? []).map((item, index) => ({
+    category,
+    item,
+    categoryIndex: keys.indexOf(category),
+    first: index === 0,
+    length: groups.get(category)?.length ?? 0,
+  })),
+)
+const rows = rowCategories.flatMap((category) =>
+  (groups.get(category) ?? []).map((item, index) => ({
+    category,
+    item,
+    categoryIndex: keys.indexOf(category),
+    first: index === 0,
+    length: groups.get(category)?.length ?? 0,
+  })),
+)
+const cellsBeforeRow = rows.map((_, rowIndex) =>
+  rows.slice(0, rowIndex).reduce((sum, row) => {
+    const count = columnCategories
+      .slice(0, row.categoryIndex)
+      .reduce(
+        (total, category) => total + (groups.get(category)?.length ?? 0),
+        0,
+      )
+    return sum + count
+  }, 0),
+)
+const storageKey = `logic-puzzle-${id ?? keys.join("-")}`
+const readOnly = Boolean(values?.length)
+---
+
+<logic-grid
+  data-storage-key={storageKey}
+  data-readonly={readOnly || undefined}
+  style={`--logic-cell: ${cellSize}px`}
+>
+  <table>
+    <colgroup>
+      <col class="group-column">
+      <col class="label-column">
+      {columns.map(() => <col class="grid-column" />)}
+    </colgroup>
+    <thead>
+      <tr>
+        <td class="empty"></td>
+        <td class="empty"></td>
+        {columnCategories.map((category) => <th colspan={groups.get(category)?.length ?? 0} scope="colgroup">{category}</th>)}
+      </tr>
+      <tr>
+        <td class="empty"></td>
+        <td class="empty"></td>
+        {columns.map((column) => <th class="column-label" scope="col">{column.item}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((row, rowIndex) => {
+        const validColumns = columnCategories.slice(0, row.categoryIndex).reduce(
+          (sum, category) => sum + (groups.get(category)?.length ?? 0),
+          0,
+        )
+        return (
+          <tr>
+            {row.first && <th class="row-group" rowspan={row.length} scope="rowgroup">{row.category}</th>}
+            <th class="row-label" scope="row">{row.item}</th>
+            {columns.slice(0, validColumns).map((_, columnIndex) => {
+              const key = `${rowIndex}:${columnIndex}`
+              const supplied = values?.[(cellsBeforeRow[rowIndex] ?? 0) + columnIndex] ?? ""
+              return (
+                <td class="logic-cell">
+                  {readOnly ? (
+                    <span>{supplied}</span>
+                  ) : (
+                    <button type="button" data-cell={key} aria-label={`${row.item}, ${columns[columnIndex]?.item}: empty`} aria-pressed="false"></button>
+                  )}
+                </td>
+              )
+            })}
+            {columns.slice(validColumns).map(() => <td class="empty"></td>)}
+          </tr>
+        )
+      })}
+    </tbody>
+  </table>
+</logic-grid>
+
+<style>
+  logic-grid {
+    display: block;
+    max-inline-size: 100%;
+    margin-block: var(--space-m);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+  }
+  table {
+    width: max-content;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+  }
+  col.group-column,
+  col.grid-column {
+    width: var(--logic-cell);
+  }
+  col.label-column {
+    width: 1%;
+  }
+  th,
+  td {
+    height: var(--logic-cell);
+  }
+  th {
+    padding: 0.2rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 30%, transparent);
+    font-weight: var(--font-weight-medium);
+    text-align: center;
+  }
+  .column-label,
+  .row-group {
+    width: var(--logic-cell);
+    min-width: var(--logic-cell);
+    max-width: var(--logic-cell);
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+    font-weight: var(--font-weight-normal);
+  }
+  .column-label {
+    white-space: nowrap;
+  }
+  .row-label {
+    width: 1%;
+    min-width: max-content;
+    text-align: end;
+    font-weight: var(--font-weight-normal);
+    white-space: nowrap;
+  }
+  td.logic-cell {
+    width: var(--logic-cell);
+    min-width: var(--logic-cell);
+    max-width: var(--logic-cell);
+    height: var(--logic-cell);
+    min-height: var(--logic-cell);
+    max-height: var(--logic-cell);
+    padding: 0;
+    border: 1px solid color-mix(in oklab, var(--foreground) 30%, transparent);
+    text-align: center;
+    white-space: pre-line;
+  }
+  td.logic-cell button {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    color: var(--foreground);
+    background: transparent;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+  }
+  td.logic-cell button:hover {
+    background: var(--muted);
+  }
+  td.logic-cell button[data-value="✓"] {
+    color: var(--primary);
+  }
+  td.logic-cell span {
+    display: grid;
+    place-items: center;
+    min-height: var(--logic-cell);
+    padding: 0.15rem;
+  }
+  td.empty {
+    border: 0;
+  }
+</style>
+
+<script>
+  const nextValue = (value: string) =>
+    value === "" ? "✗" : value === "✗" ? "✓" : ""
+
+  for (const grid of document.querySelectorAll<HTMLElement>(
+    "logic-grid:not([data-ready])",
+  )) {
+    grid.dataset.ready = ""
+    const storageKey = grid.dataset.storageKey ?? "logic-puzzle"
+    const buttons = [
+      ...grid.querySelectorAll<HTMLButtonElement>("button[data-cell]"),
+    ]
+    let state: Record<string, string> = {}
+    try {
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        const parsed: unknown = JSON.parse(saved)
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed))
+          state = parsed as Record<string, string>
+      }
+    } catch {
+      state = {}
+    }
+
+    const render = (button: HTMLButtonElement, value: string) => {
+      button.textContent = value
+      button.dataset.value = value
+      button.setAttribute(
+        "aria-pressed",
+        value === "✓" ? "true" : value === "✗" ? "mixed" : "false",
+      )
+      const base =
+        button.getAttribute("aria-label")?.replace(/: .+$/, "") ?? "Cell"
+      button.setAttribute(
+        "aria-label",
+        `${base}: ${value === "" ? "empty" : value === "✗" ? "excluded" : "selected"}`,
+      )
+    }
+    for (const button of buttons)
+      render(button, state[button.dataset.cell ?? ""] ?? "")
+
+    let painting: string | null = null
+    const update = (
+      button: HTMLButtonElement,
+      value = nextValue(button.dataset.value ?? ""),
+    ) => {
+      const key = button.dataset.cell
+      if (!key) return
+      state[key] = value
+      render(button, value)
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(state))
+      } catch {}
+    }
+    grid.addEventListener("pointerdown", (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>(
+        "button[data-cell]",
+      )
+      if (!button) return
+      event.preventDefault()
+      painting = nextValue(button.dataset.value ?? "")
+      update(button, painting)
+      button.setPointerCapture(event.pointerId)
+    })
+    grid.addEventListener("pointermove", (event) => {
+      if (painting === null || event.buttons === 0) return
+      const target = document
+        .elementFromPoint(event.clientX, event.clientY)
+        ?.closest<HTMLButtonElement>("button[data-cell]")
+      if (target && grid.contains(target) && target.dataset.value !== painting)
+        update(target, painting)
+    })
+    const stop = () => {
+      painting = null
+    }
+    grid.addEventListener("pointerup", stop)
+    grid.addEventListener("pointercancel", stop)
+    grid.addEventListener("click", (event) => event.preventDefault())
+    grid.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return
+      const button = (event.target as Element).closest<HTMLButtonElement>(
+        "button[data-cell]",
+      )
+      if (!button) return
+      event.preventDefault()
+      update(button)
+    })
+  }
+</script>

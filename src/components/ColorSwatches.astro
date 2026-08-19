@@ -1,35 +1,46 @@
 ---
-import { colors, type ColorName, type Theme } from '@/lib/colors'
-
-interface Props {
-  theme: Theme
-}
-
+import { colors, type ColorName, type Theme } from "@/lib/colors"
+type Props = { theme: Theme }
 const { theme } = Astro.props
 const themeColors = colors[theme]
-const colorNames = Object.keys(themeColors) as ColorName[]
-const bgColor = themeColors.background
-const textColor = themeColors.foreground
+const names = Object.keys(themeColors) as ColorName[]
 ---
 
-<div
-  class="rounded-lg border p-4"
-  style={`background: ${bgColor}; color: ${textColor}; borderColor: ${textColor}`}
+<color-swatches
+  style={`--swatch-background:${themeColors.background};--swatch-foreground:${themeColors.foreground};--swatch-muted:${themeColors.muted}`}
 >
-  <div class="xs:grid-cols-2 xs:grid-cols-3 grid gap-4 md:grid-cols-4">
-    {
-      colorNames.map((name) => (
-        <div class="flex flex-col gap-1">
-          <div
-            class="aspect-[4/1] rounded"
-            style={`background: ${themeColors[name]};`}
-          />
-          <span class="text-sm font-medium">{name}</span>
-          <span class="font-mono text-[0.6rem] leading-none opacity-70">
-            {themeColors[name]}
-          </span>
-        </div>
-      ))
-    }
-  </div>
-</div>
+  {names.map((name) => <color-swatch><i style={`background:${themeColors[name]}`}></i><strong>{name}</strong><code>{themeColors[name]}</code></color-swatch>)}
+</color-swatches>
+
+<style>
+  color-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: var(--space-s);
+    padding: var(--space-s);
+    color: var(--swatch-foreground);
+    background-color: var(--swatch-background);
+    border-radius: var(--radius-lg);
+  }
+  color-swatch {
+    display: flex;
+    min-inline-size: 0;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+  i {
+    display: block;
+    aspect-ratio: 4;
+    border-radius: var(--radius-sm);
+  }
+  strong {
+    color: var(--swatch-foreground);
+    font-size: var(--step--1);
+  }
+  code {
+    overflow-wrap: anywhere;
+    color: var(--swatch-foreground);
+    background-color: var(--swatch-muted);
+    font-size: 0.65rem;
+  }
+</style>

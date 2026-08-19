@@ -1,21 +1,29 @@
 ---
-import PageHead from '@/components/PageHead.astro'
-import ResourceCard from '@/components/ResourceCard.astro'
-import Layout from '@/layouts/Layout.astro'
-import { getAllResources } from '@/lib/data-utils'
+import MetaPage from "@/components/MetaPage.astro"
+import ResourceCard from "@/components/ResourceCard.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getResources } from "@/lib/content"
 
-const resources = await getAllResources()
+const resources = await getResources()
 ---
 
-<Layout class="max-w-3xl">
-  <PageHead slot="head" title="Resources" />
-
-  <section>
-    <div class="min-w-full">
-      <h2 class="mb-4 text-2xl font-medium">Resources</h2>
-      <div class="flex flex-col gap-4">
-        {resources.map((resource) => <ResourceCard resource={resource} />)}
-      </div>
-    </div>
-  </section>
+<Layout crumbs={[{ label: "Resources", href: "/resources" }]}>
+  <MetaPage slot="head" title="Resources" />
+  <h1>Resources</h1>
+  <ul>
+    {resources.map((resource) => <ResourceCard resource={resource} />)}
+  </ul>
 </Layout>
+
+<style>
+  h1 {
+    font-size: var(--step-3);
+    font-weight: var(--font-weight-medium);
+    margin-block-end: var(--space-m);
+  }
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+</style>

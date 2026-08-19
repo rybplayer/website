@@ -1,9 +1,9 @@
 ---
-import TalkCard from '@/components/TalkCard.astro'
-import PageHead from '@/components/PageHead.astro'
-import Layout from '@/layouts/Layout.astro'
-import talksData from '@/content/talks/talks.json'
-import type { ImageMetadata } from 'astro'
+import MetaPage from "@/components/MetaPage.astro"
+import TalkCard from "@/components/TalkCard.astro"
+import Layout from "@/layouts/Layout.astro"
+import talksData from "@/content/talks/talks.json"
+import type { ImageMetadata } from "astro"
 
 type TalkData = {
   slug: string
@@ -13,41 +13,39 @@ type TalkData = {
   githubUrl: string
   date: string
 }
-
-const images = import.meta.glob('/src/content/talks/media/*', {
+const images = import.meta.glob("/src/content/talks/media/*", {
   eager: true,
-  import: 'default',
+  import: "default",
 })
-
-const talkItems = ((talksData as { items?: TalkData[] }).items ?? [])
-const talks = talkItems
-  .map(({ previewImage, ...rest }) => {
-    if (!previewImage) {
-      return { ...rest }
-    }
-
-    const resolvedImage = images[
-      `/src/content/talks/media/${previewImage}`
-    ] as ImageMetadata | undefined
-
-    return resolvedImage ? { ...rest, previewImage: resolvedImage } : { ...rest }
+const talks = ((talksData as { items?: TalkData[] }).items ?? [])
+  .map(({ previewImage, ...talk }) => {
+    const image = previewImage
+      ? (images[`/src/content/talks/media/${previewImage}`] as
+          | ImageMetadata
+          | undefined)
+      : undefined
+    return image ? { ...talk, previewImage: image } : talk
   })
-  .sort(
-    (a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf(),
-  )
+  .sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf())
 ---
 
-<Layout class="max-w-3xl">
-  <PageHead slot="head" title="Talks" />
-
-  <section>
-    <div class="min-w-full">
-      <h2 class="mb-4 text-2xl font-medium">Talks</h2>
-      <div class="flex flex-col gap-4">
-        {talks.map((talk) => (
-          <TalkCard talk={talk} />
-        ))}
-      </div>
-    </div>
-  </section>
+<Layout crumbs={[{ label: "Talks", href: "/talks" }]}>
+  <MetaPage slot="head" title="Talks" />
+  <h1>Talks</h1>
+  <ul>
+    {talks.map((talk) => <TalkCard talk={talk} />)}
+  </ul>
 </Layout>
+
+<style>
+  h1 {
+    font-size: var(--step-3);
+    font-weight: var(--font-weight-medium);
+    margin-block-end: var(--space-m);
+  }
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+</style>

@@ -3,11 +3,9 @@ title: 'The Technicals'
 description: 'Why Astro? Why mdx? The tech stack.'
 date: 2025-12-22
 tags: ['programming']
-authors: ['Ryan Batubara']
-icon: 'lucide:layers'
+authors: ['ryan-batubara']
 ---
 
-import Callout from '@/components/Callout.astro'
 
 ## Why Astro?
 
@@ -21,7 +19,7 @@ From the start I knew I wanted [Astro](https://astro.build/) as my web framework
 
 I didn't want to start from nothing, so I went through every blog template on [Astro themes](https://astro.build/themes). [Erudite](https://github.com/jktrn/astro-erudite) was the best fit at the time.
 
-<Callout title="An anecdote on Erudite" variant="note" defaultOpen={false}>
+:::note[An anecdote on Erudite]{closed}
 
 [Erudite](https://github.com/jktrn/astro-erudite) claims to be loosely inspired by [Astro Micro](https://astro-micro.vercel.app/), which was a fork of [Astro Nano](https://astro.build/themes/details/astronano/). Astro Nano was actually my second choice template, since it had precisely the bare minimum for a quality blog and nothing more. Astro Micro added search, comments, and other features to Astro Nano, alongside a visual overhaul. For me, Erudite took the best principles of Nano and Micro, got rid of everything else, and added the ideal post navigation system.
 
@@ -29,11 +27,11 @@ Two examples solidified my choice of Erudite over every other template. [Enscrib
 
 Since then, I've actually gotten in touch with Enscribe, who ended up being very influential in determining the color palette for this site and getting me to use [Figma](https://www.figma.com/).\
 
-</Callout>
+:::
 
 ## The tech stack
 
-[Astro](https://astro.build/) is the web framework. The primary UI library is [shadcn](https://ui.shadcn.com/) so [Tailwind](https://tailwindcss.com/) is also used. The site is 100% [TypeScript](https://www.typescriptlang.org/). Most components are vanilla Astro, but more complex ones are in [React](https://react.dev/), to be replaced by [Svelte](https://svelte.dev/) when LLMs get better at writing Svelte. The site is hosted on Github through [Github pages](https://docs.github.com/en/pages).
+[Astro](https://astro.build/) is the web framework, with [MDX](https://mdxjs.com/) retained for custom content components. Markdown and MDX share the same [Satteri](https://satteri.bruits.org/) pipeline. [Temml](https://temml.org/) renders math as semantic MathML, and [Expressive Code](https://expressive-code.com/) handles code. The interface uses vanilla Astro components, progressively enhanced custom elements, and native CSS; it does not need a client UI framework, Tailwind, or a component library. The site is written in [TypeScript](https://www.typescriptlang.org/) and hosted on GitHub through [GitHub Pages](https://docs.github.com/en/pages).
 
 The flowchart for a typical blog post is:
 

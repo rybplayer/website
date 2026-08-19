@@ -1,20 +1,40 @@
----
-
----
-
-<span class="spoiler" onclick="this.classList.toggle('revealed')"><slot /></span
+<button
+  type="button"
+  class="spoiler"
+  aria-label="Reveal spoiler"
+  aria-pressed="false"
 >
+  <slot />
+</button>
 
 <style>
   .spoiler {
-    background-color: oklch(from var(--foreground) l c h / 0.3);
+    display: inline;
+    padding-inline: 0.2em;
+    border: 0;
+    border-radius: var(--radius-sm);
     color: transparent;
+    background: color-mix(in oklab, var(--foreground) 30%, transparent);
     cursor: pointer;
-    padding: 0 0.2em;
-    border-radius: 0.2em;
   }
-  .spoiler.revealed {
-    background-color: transparent;
+  .spoiler[data-revealed] {
     color: inherit;
+    background: transparent;
   }
 </style>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    "button.spoiler:not([data-ready])",
+  )) {
+    button.dataset.ready = ""
+    button.addEventListener("click", () => {
+      const revealed = button.toggleAttribute("data-revealed")
+      button.setAttribute("aria-pressed", String(revealed))
+      button.setAttribute(
+        "aria-label",
+        revealed ? "Hide spoiler" : "Reveal spoiler",
+      )
+    })
+  }
+</script>

@@ -1,55 +1,77 @@
 ---
-import Link from '@/components/Link.astro'
-import { cardVariants } from '@/lib/card-variants'
-import { cn } from '@/lib/utils'
-import { Image } from 'astro:assets'
-import type { ImageMetadata } from 'astro'
+import ExternalIcon from "@/assets/icons/external.svg"
+import { formatDate } from "@/lib/utils"
+import { Image } from "astro:assets"
+import type { ImageMetadata } from "astro"
 
 type Talk = {
   title: string
   description?: string
-  previewImage?: ImageMetadata
   githubUrl: string
   date: string
+  previewImage?: ImageMetadata
 }
-
-interface Props {
-  talk: Talk
-  disableHover?: boolean
-}
-
-const { talk, disableHover = false } = Astro.props
+type Props = { talk: Talk }
+const { talk } = Astro.props
 ---
 
-<div
-  class={cn(
-    cardVariants({
-      variant: 'default',
-      hover: disableHover ? 'disabled' : 'enabled',
-    }),
-  )}
->
-  <Link href={talk.githubUrl} class="flex flex-col gap-4 sm:flex-row" external>
-    {
-      talk.previewImage && (
-        <div class="w-full border sm:max-w-3xs sm:shrink-0">
-          <Image
-            src={talk.previewImage}
-            alt={talk.title}
-            width={1200}
-            widths={[128, 256, 512]}
-            height={630}
-            class="object-cover"
-          />
-        </div>
-      )
-    }
-    <div class="grow">
-      <h3 class="mb-1 text-lg font-semibold">{talk.title}</h3>
-      {talk.description && (
-        <p class="text-muted-foreground mb-2 text-sm">{talk.description}</p>
-      )}
-    </div>
-  </Link>
-</div>
+<li>
+  {talk.previewImage && <a href={talk.githubUrl} tabindex="-1" aria-hidden="true"><Image src={talk.previewImage} alt="" width={640} height={336} /></a>}
+  <entry-info>
+    <a href={talk.githubUrl} target="_blank" rel="noopener noreferrer"
+      >{talk.title}<ExternalIcon aria-hidden="true" /></a
+    >
+    <time datetime={new Date(talk.date).toISOString()}
+      >{formatDate(new Date(talk.date))}</time
+    >
+    {talk.description && <p>{talk.description}</p>}
+  </entry-info>
+</li>
 
+<style>
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-s);
+  }
+  li > a {
+    flex-shrink: 0;
+    inline-size: 14rem;
+  }
+  li > a :global(img) {
+    inline-size: 100%;
+    block-size: auto;
+  }
+  entry-info {
+    display: flex;
+    flex-direction: column;
+  }
+  entry-info > a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-size: var(--step-1);
+    font-weight: var(--font-weight-medium);
+  }
+  entry-info > a :global(svg) {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+  time {
+    font-size: var(--step--1);
+    color: var(--muted-foreground);
+    margin-block-end: var(--space-3xs);
+  }
+  p {
+    color: var(--muted-foreground);
+  }
+  @media (width < 40rem) {
+    li {
+      flex-direction: column;
+    }
+    li > a {
+      inline-size: 100%;
+      max-inline-size: 32rem;
+    }
+  }
+</style>
