@@ -1,6 +1,5 @@
 ---
-import ExternalIcon from "@/assets/icons/external.svg"
-import { formatDate } from "@/lib/utils"
+import { formatMonthYear } from "@/lib/utils"
 import { Image } from "astro:assets"
 import type { CollectionEntry } from "astro:content"
 
@@ -29,22 +28,18 @@ const { name, description, link, tags, image, startDate, endDate } =
       {startDate && (
           <project-dates>
             <time datetime={startDate.toISOString()}>
-              {formatDate(startDate)}
+              {formatMonthYear(startDate)}
             </time>
             {" → "}
             {endDate ? (
               <time datetime={endDate.toISOString()}>
-                {formatDate(endDate)}
+                {formatMonthYear(endDate)}
               </time>
             ) : (
               "Present"
             )}
           </project-dates>
         )}
-      <project-link>
-        <ExternalIcon aria-hidden="true" />
-        {new URL(link).hostname}
-      </project-link>
     </entry-meta>
     <p>{description}</p>
     {tags && tags.length > 0 && (
@@ -96,23 +91,6 @@ const { name, description, link, tags, image, startDate, endDate } =
           display: flex;
           align-items: center;
           gap: var(--space-3xs);
-        }
-
-        project-link {
-          display: flex;
-          align-items: center;
-          gap: var(--space-3xs);
-          color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
-
-          svg {
-            inline-size: 1em;
-            block-size: 1em;
-          }
-        }
-
-        project-dates ~ project-link::before {
-          content: "·";
-          color: var(--muted-foreground);
         }
       }
 

@@ -1,32 +1,14 @@
 ---
-import Email from "@/assets/icons/email.svg"
-import GitHub from "@/assets/icons/github.svg"
-import Globe from "@/assets/icons/globe.svg"
-import Link from "@/assets/icons/link.svg"
-import Twitter from "@/assets/icons/twitter.svg"
 import SocialIcons from "@/components/SocialIcons.astro"
+import { getSocialLinks } from "@/consts"
 import { normalizePath } from "@/lib/utils"
-import type { SvgComponent } from "astro/types"
 import type { CollectionEntry } from "astro:content"
 
 type Props = { author: CollectionEntry<"authors"> }
 
 const { author } = Astro.props
-const { name, pronouns, avatar, bio, mail, socials } = author.data
-
-const ICONS: Record<string, { label: string; icon: SvgComponent }> = {
-  website: { label: "Website", icon: Globe },
-  github: { label: "GitHub", icon: GitHub },
-  twitter: { label: "Twitter", icon: Twitter },
-}
-
-const links = [
-  ...Object.entries(socials ?? {}).map(([key, href]) => ({
-    href,
-    ...(ICONS[key] ?? { label: key, icon: Link }),
-  })),
-  ...(mail ? [{ href: `mailto:${mail}`, label: "Email", icon: Email }] : []),
-]
+const { name, pronouns, avatar, bio, socials } = author.data
+const links = getSocialLinks(socials ?? [])
 
 const href = `/authors/${author.id}`
 const isCurrent = normalizePath(Astro.url.pathname) === href

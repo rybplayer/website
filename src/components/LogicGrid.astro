@@ -4,14 +4,68 @@ type Props = {
   categories: Categories
   id?: string
   cellSize?: number
+  cellWidth?: number
+  cellHeight?: number
+  categorySizeLimit?: number
   values?: string[]
 }
 
-const { categories, id, cellSize = 25, values } = Astro.props
-const keys = categories.map(([key]) => key)
+const {
+  categories,
+  id,
+  cellSize = 25,
+  cellWidth,
+  cellHeight,
+  categorySizeLimit = 64,
+  values,
+} = Astro.props
 const groups = new Map(categories)
+const keys = [...groups.keys()]
+const safeCellSize = Number.isFinite(cellSize) && cellSize > 0 ? cellSize : 25
+const safeCellWidth =
+  Number.isFinite(cellWidth) && (cellWidth ?? 0) > 0
+    ? (cellWidth ?? safeCellSize)
+    : safeCellSize
+const safeCellHeight =
+  Number.isFinite(cellHeight) && (cellHeight ?? 0) > 0
+    ? (cellHeight ?? safeCellSize)
+    : safeCellSize
+const safeCategorySizeLimit =
+  Number.isFinite(categorySizeLimit) && categorySizeLimit > 0
+    ? categorySizeLimit
+    : 64
 const columnCategories = keys.slice(0, -1)
 const rowCategories = keys.slice(1).reverse()
+const categoryDemand = (categoryKeys: string[]) =>
+  categoryKeys.reduce((largest, category) => {
+    const itemCount = groups.get(category)?.length ?? 0
+    return Math.max(
+      largest,
+      Math.ceil((Array.from(category).length * 8 + 8) / Math.max(itemCount, 1)),
+    )
+  }, 0)
+const resolvedCellWidth = Math.max(
+  safeCellWidth,
+  Math.min(safeCategorySizeLimit, categoryDemand(columnCategories)),
+)
+const resolvedCellHeight = Math.max(
+  safeCellHeight,
+  Math.min(safeCategorySizeLimit, categoryDemand(rowCategories)),
+)
+const columnLabelDemand = columnCategories.reduce(
+  (largest, category) =>
+    Math.max(
+      largest,
+      ...(groups.get(category) ?? []).map(
+        (item) => Array.from(item).length * 8 + 8,
+      ),
+    ),
+  0,
+)
+const resolvedColumnLabelHeight = Math.max(
+  resolvedCellWidth,
+  Math.min(safeCategorySizeLimit, columnLabelDemand),
+)
 const columns = columnCategories.flatMap((category) =>
   (groups.get(category) ?? []).map((item, index) => ({
     category,
@@ -48,7 +102,7 @@ const readOnly = Boolean(values?.length)
 <logic-grid
   data-storage-key={storageKey}
   data-readonly={readOnly || undefined}
-  style={`--logic-cell: ${cellSize}px`}
+  style={`--logic-cell-width: ${resolvedCellWidth}px; --logic-cell-height: ${resolvedCellHeight}px; --logic-column-label-height: ${resolvedColumnLabelHeight}px`}
 >
   <table>
     <colgroup>
@@ -60,12 +114,12 @@ const readOnly = Boolean(values?.length)
       <tr>
         <td class="empty"></td>
         <td class="empty"></td>
-        {columnCategories.map((category) => <th colspan={groups.get(category)?.length ?? 0} scope="colgroup">{category}</th>)}
+        {columnCategories.map((category) => <th class="column-group" colspan={groups.get(category)?.length ?? 0} scope="colgroup">{category}</th>)}
       </tr>
       <tr>
         <td class="empty"></td>
         <td class="empty"></td>
-        {columns.map((column) => <th class="column-label" scope="col">{column.item}</th>)}
+        {columns.map((column) => <th class="column-label" scope="col"><span>{column.item}</span></th>)}
       </tr>
     </thead>
     <tbody>
@@ -77,14 +131,15 @@ const readOnly = Boolean(values?.length)
         return (
           <tr>
             {row.first && <th class="row-group" rowspan={row.length} scope="rowgroup">{row.category}</th>}
-            <th class="row-label" scope="row">{row.item}</th>
+            <th class="row-label" scope="row"><span>{row.item}</span></th>
             {columns.slice(0, validColumns).map((_, columnIndex) => {
               const key = `${rowIndex}:${columnIndex}`
               const supplied = values?.[(cellsBeforeRow[rowIndex] ?? 0) + columnIndex] ?? ""
+              const displayValue = supplied === "✓" ? "✔" : supplied
               return (
                 <td class="logic-cell">
                   {readOnly ? (
-                    <span>{supplied}</span>
+                    <span>{displayValue}</span>
                   ) : (
                     <button type="button" data-cell={key} aria-label={`${row.item}, ${columns[columnIndex]?.item}: empty`} aria-pressed="false"></button>
                   )}
@@ -101,62 +156,115 @@ const readOnly = Boolean(values?.length)
 
 <style>
   logic-grid {
+    --logic-label-limit: 10rem;
+
     display: block;
+    inline-size: 100%;
     max-inline-size: 100%;
     margin-block: var(--space-m);
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: clip;
     overscroll-behavior-inline: contain;
   }
   table {
-    width: max-content;
-    margin: 0;
+    display: table;
+    inline-size: max-content;
+    max-inline-size: none;
+    margin-block: 0;
+    margin-inline: auto;
+    overflow: visible;
     border-collapse: collapse;
+    table-layout: auto;
     font-size: var(--step--1);
+    line-height: 1;
+  }
+  thead,
+  tr {
+    border: 0;
   }
   col.group-column,
   col.grid-column {
-    width: var(--logic-cell);
+    width: var(--logic-cell-width);
   }
   col.label-column {
-    width: 1%;
+    width: auto;
   }
   th,
   td {
-    height: var(--logic-cell);
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: none;
+    min-height: 0;
+    max-height: none;
+    color: var(--foreground);
+    vertical-align: middle;
   }
   th {
     padding: 0.2rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 30%, transparent);
-    font-weight: var(--font-weight-medium);
     text-align: center;
   }
-  .column-label,
+  .column-group {
+    height: var(--logic-cell-width);
+    font-weight: 700;
+  }
   .row-group {
-    width: var(--logic-cell);
-    min-width: var(--logic-cell);
-    max-width: var(--logic-cell);
+    width: var(--logic-cell-width);
+    min-width: var(--logic-cell-width);
+    max-width: var(--logic-cell-width);
+    font-weight: 700;
     writing-mode: vertical-rl;
     rotate: 180deg;
-    font-weight: var(--font-weight-normal);
   }
   .column-label {
-    white-space: nowrap;
+    width: var(--logic-cell-width);
+    min-width: var(--logic-cell-width);
+    max-width: var(--logic-cell-width);
+    height: var(--logic-column-label-height);
+    padding: 0;
+    text-align: center;
+    vertical-align: bottom;
+    font-weight: var(--font-weight-normal);
+  }
+  .column-label > span {
+    box-sizing: border-box;
+    display: inline-block;
+    inline-size: max-content;
+    max-inline-size: var(--logic-column-label-height);
+    max-block-size: 100%;
+    padding: 0.2rem;
+    overflow-wrap: anywhere;
+    text-align: start;
+    white-space: normal;
+    writing-mode: vertical-rl;
+    rotate: 180deg;
   }
   .row-label {
-    width: 1%;
-    min-width: max-content;
+    width: auto;
+    min-width: 0;
+    max-width: var(--logic-label-limit);
+    height: var(--logic-cell-height);
+    padding: 0;
     text-align: end;
     font-weight: var(--font-weight-normal);
-    white-space: nowrap;
+  }
+  .row-label > span {
+    box-sizing: border-box;
+    display: block;
+    width: max-content;
+    max-width: var(--logic-label-limit);
+    padding: 0.2rem;
+    overflow-wrap: anywhere;
+    text-align: end;
+    white-space: normal;
   }
   td.logic-cell {
-    width: var(--logic-cell);
-    min-width: var(--logic-cell);
-    max-width: var(--logic-cell);
-    height: var(--logic-cell);
-    min-height: var(--logic-cell);
-    max-height: var(--logic-cell);
+    width: var(--logic-cell-width);
+    min-width: var(--logic-cell-width);
+    max-width: var(--logic-cell-width);
+    height: var(--logic-cell-height);
+    min-height: var(--logic-cell-height);
+    max-height: var(--logic-cell-height);
     padding: 0;
     border: 1px solid color-mix(in oklab, var(--foreground) 30%, transparent);
     text-align: center;
@@ -171,27 +279,36 @@ const readOnly = Boolean(values?.length)
     cursor: pointer;
     touch-action: none;
     user-select: none;
+    font-size: 1.15em;
+    font-weight: 700;
+    line-height: 1;
   }
   td.logic-cell button:hover {
     background: var(--muted);
   }
-  td.logic-cell button[data-value="✓"] {
+  td.logic-cell button[data-value="✔"] {
     color: var(--primary);
   }
   td.logic-cell span {
     display: grid;
     place-items: center;
-    min-height: var(--logic-cell);
+    min-height: var(--logic-cell-height);
     padding: 0.15rem;
   }
   td.empty {
+    min-width: 0;
+    max-width: none;
+    padding: 0;
     border: 0;
+    color: inherit;
+    text-align: inherit;
+    vertical-align: middle;
   }
 </style>
 
 <script>
   const nextValue = (value: string) =>
-    value === "" ? "✗" : value === "✗" ? "✓" : ""
+    value === "" ? "✗" : value === "✗" ? "✔" : ""
 
   for (const grid of document.querySelectorAll<HTMLElement>(
     "logic-grid:not([data-ready])",
@@ -214,17 +331,22 @@ const readOnly = Boolean(values?.length)
     }
 
     const render = (button: HTMLButtonElement, value: string) => {
-      button.textContent = value
-      button.dataset.value = value
+      const displayValue = value === "✓" ? "✔" : value
+      button.textContent = displayValue
+      button.dataset.value = displayValue
       button.setAttribute(
         "aria-pressed",
-        value === "✓" ? "true" : value === "✗" ? "mixed" : "false",
+        displayValue === "✔"
+          ? "true"
+          : displayValue === "✗"
+            ? "mixed"
+            : "false",
       )
       const base =
         button.getAttribute("aria-label")?.replace(/: .+$/, "") ?? "Cell"
       button.setAttribute(
         "aria-label",
-        `${base}: ${value === "" ? "empty" : value === "✗" ? "excluded" : "selected"}`,
+        `${base}: ${displayValue === "" ? "empty" : displayValue === "✗" ? "excluded" : "selected"}`,
       )
     }
     for (const button of buttons)

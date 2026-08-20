@@ -4,6 +4,7 @@ description: 'Colors, fonts, and more. The fancy stuff.'
 date: 2025-12-22
 tags: ['programming']
 authors: ['ryan-batubara']
+order: 2
 ---
 
 import Spoiler from '@/components/Spoiler.astro'
@@ -16,7 +17,7 @@ import Banner from './webdev-misadventures.svg'
 I spent more time thinking about the site's color palette than any other design decision. This was largely because I wanted a palette that:
 
 1. Had a <strong class="demo-primary">primary color</strong> that was visible in both light and dark mode.
-2. Had a <strong class="demo-primary">primary color</strong> with <strong class="demo-muted">many</strong> <strong class="demo-accent">subtle</strong> <strong class="demo-secondary">shades</strong>, making light and dark mode palettes easy.
+2. Had a <strong class="demo-primary">primary color</strong> with many <strong class="demo-accent">subtle </strong> <strong class="demo-secondary">shades</strong>, making light and dark mode palettes easy.
 3. Had a wide available [color gamut](https://en.wikipedia.org/wiki/Gamut) on most displays.
 
 I did this by [experimenting](https://oklch.com/#0.5,0.1,130,100) with [`okclh(L C H / a)`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/oklch), which controls
@@ -87,11 +88,9 @@ function demo() {
 }
 ```
 
-The shared renderer keeps inline annotations and full code blocks visually consistent without a second rehype pipeline or a package patch.
-
 ## Typography
 
-The current default fonts are the variable [IBM Plex Sans and Mono](https://www.ibm.com/plex/). They keep the modern, readable character of the original design while fitting the native CSS typography system.
+The current default fonts are the variable [IBM Plex Sans and Mono](https://www.ibm.com/plex/). It used to be [Inter](https://fonts.google.com/specimen/Inter), which I think looks slightly better than IBM Plex. However, Inter is unfortunately very generic and overused right now.
 
 [Serif](https://en.wikipedia.org/wiki/Serif) vs [sans-serif](https://en.wikipedia.org/wiki/Sans-serif) was an unexpected point of contention in this website's design. Half of the people I asked feedback from preferred sans-serif, because it looks modern and clean. The other half argued serif was more academic and better suited my purposes.
 

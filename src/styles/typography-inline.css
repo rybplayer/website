@@ -34,7 +34,7 @@ prose-content {
     font-size: 0.9em;
     padding: 0.1em 0.3em;
     border-radius: var(--radius-sm);
-    background-color: var(--site-code-background);
+    background-color: var(--site-inline-code-background);
 
     &[data-ec] :where(span[style^="--"]:not([class])) {
       color: light-dark(var(--0, inherit), var(--1, inherit));

@@ -24,7 +24,7 @@ export const ecOptions: SatteriExpressiveCodeOptions = {
   styleOverrides: {
     codeFontSize: "var(--step--1)",
     codeFontFamily: "var(--font-mono)",
-    codeBackground: "var(--site-code-background)",
+    codeBackground: "var(--site-block-code-background)",
     borderColor: "var(--border)",
     borderRadius: "0",
     uiFontFamily: "var(--font-sans)",
@@ -40,7 +40,7 @@ export const ecOptions: SatteriExpressiveCodeOptions = {
       editorTabBarBackground: "transparent",
       editorTabBarBorderBottomColor: "transparent",
       frameBoxShadowCssValue: "none",
-      terminalBackground: "var(--site-code-background)",
+      terminalBackground: "var(--site-block-code-background)",
       terminalTitlebarBackground: "transparent",
       terminalTitlebarBorderBottomColor: "transparent",
       terminalTitlebarForeground: "var(--muted-foreground)",

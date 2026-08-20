@@ -1,7 +1,7 @@
 ---
-import type { SvgComponent } from "astro/types"
+import type { SocialLink } from "@/consts"
 
-type Props = { links: { href: string; label: string; icon: SvgComponent }[] }
+type Props = { links: readonly SocialLink[] }
 
 const { links } = Astro.props
 const isExternal = (href: string) => /^https?:\/\//.test(href)

@@ -18,8 +18,6 @@
   --ground-dark:    oklch(0.12 0 130);
   --ground-light:   oklch(0.9941 0.01 130);
   --ground-primary: oklch(0.5 0.1 130);
-  --banner-light:   oklch(0.75 0.07 130);
-  --banner-dark:    oklch(0.3 0.1 130);
   --site-accent: light-dark(oklch(0.75 0.07 130), oklch(0.15 0.2 130));
 
   --background:         light-dark(var(--ground-light), var(--ground-dark));
@@ -36,7 +34,14 @@
   --muted-foreground: light-dark(oklch(0.18 0 130), oklch(0.85 0.01 130));
   --accent: var(--site-accent);
   --accent-foreground: var(--foreground);
-  --site-code-background: light-dark(oklch(0.75 0.07 130), oklch(0.13 0.04 130));
+  --site-inline-code-background: light-dark(
+    oklch(0.9 0.03 130),
+    oklch(0.2 0.05 130)
+  );
+  --site-block-code-background: light-dark(
+    oklch(0.95 0.03 130),
+    oklch(0.12 0.05 130)
+  );
   --destructive:        var(--red-11);
   --border: light-dark(oklch(0.9 0 130), oklch(0.25 0 130));
   --ring: light-dark(oklch(0.7 0 130), var(--ground-light));

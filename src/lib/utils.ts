@@ -7,6 +7,14 @@ export function formatDate(date: Date): string {
   }).format(date)
 }
 
+export function formatMonthYear(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(date)
+}
+
 export const isSubpost = (id: string) => id.includes("/")
 
 export const subpostSlug = (id: string) => id.split("/")[1]

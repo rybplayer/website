@@ -106,7 +106,7 @@ Logic grids may have a lot of constraints, but they're useful for solving puzzle
 
 You are given 12 locked boxes. They all require different keys to be opened, and there are no duplicate keys.
 
-<img src={KeyDeductions.src} class="content-illustration invert-in-dark" style="--content-max: 600px" />
+<img src={KeyDeductions.src} class="content-illustration invert-in-dark" style="--content-max: 400px" />
 
 You are given keys to boxes 1, 2, and 3, which are not in any other box. Besides boxes 1, 2, and 3, 6 of the other boxes contain a single key, while two of the remaining contain nothing and the third a prize.
 
@@ -170,6 +170,7 @@ It's a lot of steps, but many of them (especially step 1) become trivially obvio
 <LogicPuzzle
   id="key-deductions-minimal"
   cellSize={30}
+  cellHeight={80}
   categories={[
     ['Boxes', Array.from({ length: 12 }, (_, i) => `${i + 1}`)],
     ['Contents', ['contents']],
@@ -317,7 +318,9 @@ This puzzle is from [_Montague Island Mysteries_, puzzle 12.4](https://www.amazo
 
 At first glance, this puzzle looks daunting. There are 12 different parties. Each of them gives up to two statements, and these statements involve "and", "or", and "if." It feels like there's no solid ground to start on.
 
-At this point, you've probably guessed that logic grids can be used to solve this problem. This is a post about logic grids, after all. Indeed, a _very_ clever logic grid can be used to solve this problem. Here's a pretty big hint: <Spoiler> If a statement is corroborated by two or more guests (or staff, respectively), it must be true. </Spoiler>
+At this point, you've probably guessed that logic grids can be used to solve this problem. This is a post about logic grids, after all. Indeed, a _very_ clever logic grid can be used to solve this problem. Here's a pretty big hint:
+
+<p><Spoiler>If a statement is corroborated by two or more guests (or staff, respectively), it must be true.</Spoiler></p>
 
 Please expand the callout below for the full solution.
 

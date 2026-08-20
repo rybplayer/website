@@ -9,8 +9,9 @@ const authors = defineCollection({
     pronouns: z.string().optional(),
     avatar: z.url().or(z.string().startsWith("/")),
     bio: z.string().optional(),
-    mail: z.email().optional(),
-    socials: z.record(z.string(), z.url()).optional(),
+    socials: z
+      .array(z.enum(["github", "scholar", "linkedin", "email", "rss"]))
+      .optional(),
   }),
 })
 

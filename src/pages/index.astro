@@ -5,9 +5,10 @@ import ProjectCard from "@/components/ProjectCard.astro"
 import SocialIcons from "@/components/SocialIcons.astro"
 import { SITE, SOCIALS } from "@/consts"
 import Layout from "@/layouts/Layout.astro"
-import { getPosts, getProjects } from "@/lib/content"
+import { getPosts, getProjects, getSubposts } from "@/lib/content"
 
 const posts = (await getPosts()).slice(0, SITE.featuredPostCount)
+const series = await getSubposts()
 const projects = (await getProjects()).slice(0, SITE.featuredProjectCount)
 ---
 
@@ -28,20 +29,31 @@ const projects = (await getProjects()).slice(0, SITE.featuredProjectCount)
       </intro-heading>
       <p>
         I'm a
+        <a href="https://cse.ucsd.edu/graduate/degree-programs/ms-program">
+          Computer Science
+        </a>
+        Master's student at <a href="https://ucsd.edu/">UCSD</a>. I also
+        completed by Bachelor's in
         <a
           href="https://math.ucsd.edu/students/undergraduate/ma30-math-computer-science-b-s/"
-          >Math-CS</a
         >
-        and <a href="https://datascience.ucsd.edu/">Data Science</a>
-        undergraduate at <a href="https://ucsd.edu/">UCSD</a>. I'm applying to
-        MS/PhD programs in Computer Science, specifically in
-        <a href="https://dandu.dev/docs/quantum-type-theory.pdf"
+          Math-CS
+        </a>
+        and
+        <a href="https://datascience.ucsd.edu/"> Data Science </a>
+        at UCSD. I'm applying to PhD programs in Computer Science, specifically
+        in
+        <a
+          href="https://math.ucsd.edu/sites/math.ucsd.edu/files/undergrad/honors-program/honors-theses/2025-2026/Batubara%2CRyan_Honors_Thesis.pdf"
           >Quantum Computing</a
         >. My other research interests include
-        <a href="https://arxiv.org/pdf/2502.12428"
-          >GPU-based computational algebra</a
+        <a
+          href="https://antsmath.org/ANTSXVII/papers/antsxvii-batubara_garzella_huang_mellberg-paper.pdf"
         >
-        and <a href="https://github.com/rybplayer/Talks">recreational math</a>.
+          GPU-based computational algebra</a
+        >
+        and
+        <a href="https://github.com/rybplayer/Talks"> recreational math </a>.
       </p>
       <intro-actions>
         <document-links>
@@ -77,7 +89,14 @@ const projects = (await getProjects()).slice(0, SITE.featuredProjectCount)
         <h2 id="posts-title">Latest blog post</h2>
         <a href="/blog">See all posts →</a>
       </listing-heading>
-      <ul>{posts.map((post) => <BlogCard post={post} />)}</ul>
+      <ul>
+        {posts.map((post) => (
+          <BlogCard
+            post={post}
+            entries={[post, ...(series.get(post.id) ?? [])]}
+          />
+        ))}
+      </ul>
     </section>
   )}
 </Layout>

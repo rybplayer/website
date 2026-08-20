@@ -2,15 +2,18 @@
 import BlogCard from "@/components/BlogCard.astro"
 import MetaPage from "@/components/MetaPage.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getPosts } from "@/lib/content"
+import { getPosts, getSubposts } from "@/lib/content"
 
 const posts = await getPosts()
+const series = await getSubposts()
 ---
 
 <Layout>
   <MetaPage slot="head" title="Blog" />
   <ul>
-    {posts.map((post) => <BlogCard post={post} />)}
+    {posts.map((post) => (
+      <BlogCard post={post} entries={[post, ...(series.get(post.id) ?? [])]} />
+    ))}
   </ul>
 </Layout>
 

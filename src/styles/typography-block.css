@@ -18,6 +18,11 @@ prose-content {
     margin-inline: auto;
   }
 
+  > :is(img, video, picture),
+  [data-callout] > :is(img, video, picture) {
+    margin-block: 0 1em;
+  }
+
   .content-illustration {
     inline-size: min(var(--content-width, 100%), var(--content-max, 100%));
     block-size: auto;
@@ -37,8 +42,14 @@ prose-content {
     img { inline-size: calc(50% - var(--space-s) / 2); }
   }
 
-  .banner-light { background: oklch(0.75 0.07 130); }
-  .banner-dark { background: oklch(0.3 0.1 130); }
+  .banner-light {
+    color-scheme: light;
+    background: var(--site-accent);
+  }
+  .banner-dark {
+    color-scheme: dark;
+    background: var(--site-accent);
+  }
   .demo-primary { color: oklch(0.5 0.1 130); }
   .demo-muted { color: var(--muted-foreground); }
   .demo-accent { color: oklch(0.62 0.12 130); }
@@ -72,6 +83,10 @@ prose-content {
   }
 
   .expressive-code {
+    --ec-codeBg: var(--site-block-code-background) !important;
+    --ec-frm-edBg: var(--site-block-code-background) !important;
+    --ec-frm-trmBg: var(--site-block-code-background) !important;
+
     content-visibility: auto;
     contain-intrinsic-block-size: auto 20rem;
 

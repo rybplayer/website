@@ -4,17 +4,27 @@ import { formatDate } from "@/lib/utils"
 import { Image } from "astro:assets"
 import { getEntries, type CollectionEntry } from "astro:content"
 
-type Props = { post: CollectionEntry<"blog"> }
+type Post = CollectionEntry<"blog">
+type Props = { post: Post; entries?: Post[] }
 
-const { post } = Astro.props
+const { post, entries = [post] } = Astro.props
 const authors = await getEntries(post.data.authors)
 const cardImage = post.data.previewImage ?? post.data.image
+const lightCardImage = post.data.image
+const darkCardImage = post.data.previewImage
 ---
 
 <li>
   {cardImage && (
       <a href={`/blog/${post.id}`} tabindex="-1" aria-hidden="true">
-        <Image src={cardImage} alt="" width={640} height={336} />
+        {lightCardImage && darkCardImage ? (
+          <>
+            <Image data-card-theme="light" src={lightCardImage} alt="" width={640} height={336} />
+            <Image data-card-theme="dark" src={darkCardImage} alt="" width={640} height={336} />
+          </>
+        ) : (
+          <Image src={cardImage} alt="" width={640} height={336} />
+        )}
       </a>
     )}
   <entry-info>
@@ -22,19 +32,9 @@ const cardImage = post.data.previewImage ?? post.data.image
     <entry-meta>
       {authors.length > 0 && (
           <entry-authors>
-            <author-avatars>
-              {authors.map((author) => (
-                <img
-                  src={author.data.avatar}
-                  alt={author.data.name}
-                  width="18"
-                  height="18"
-                />
-              ))}
-            </author-avatars>
             <author-names>
               {authors.map((author, i) => (
-                <>{i > 0 && ", "}{author.data.name}</>
+                <>{i > 0 && ", "}<a href={`/authors/${author.id}`}>{author.data.name}</a></>
               ))}
             </author-names>
           </entry-authors>
@@ -42,7 +42,7 @@ const cardImage = post.data.previewImage ?? post.data.image
       <time datetime={post.data.date.toISOString()}
         >{formatDate(post.data.date)}</time
       >
-      <span>· {readingTime(post)}</span>
+      <span>· {readingTime(entries)}</span>
       {post.data.tags && (
           <entry-tags>
             {post.data.tags.map((tag) => (
@@ -64,10 +64,16 @@ const cardImage = post.data.previewImage ?? post.data.image
     > a {
       flex-shrink: 0;
       inline-size: 14rem;
+      overflow: hidden;
+      background-color: var(--accent);
 
       :global(img) {
         inline-size: 100%;
         block-size: auto;
+      }
+
+      [data-card-theme="dark"] {
+        display: none;
       }
     }
 
@@ -93,20 +99,9 @@ const cardImage = post.data.previewImage ?? post.data.image
         entry-authors {
           display: flex;
           align-items: center;
-          gap: var(--space-3xs);
 
-          author-avatars {
-            display: flex;
-            margin-block-end: -0.1em;
-
-            img {
-              border-radius: var(--radius-full);
-              box-shadow: 0 0 0 1.5px var(--background);
-
-              &:not(:first-child) {
-                margin-inline-start: -0.375rem;
-              }
-            }
+          a {
+            color: inherit;
           }
         }
 
@@ -147,5 +142,27 @@ const cardImage = post.data.previewImage ?? post.data.image
         max-inline-size: 32rem;
       }
     }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    [data-card-theme="light"] {
+      display: none;
+    }
+    [data-card-theme="dark"] {
+      display: block;
+    }
+  }
+
+  :global(:root[data-theme="light"]) [data-card-theme="light"] {
+    display: block;
+  }
+  :global(:root[data-theme="light"]) [data-card-theme="dark"] {
+    display: none;
+  }
+  :global(:root[data-theme="dark"]) [data-card-theme="light"] {
+    display: none;
+  }
+  :global(:root[data-theme="dark"]) [data-card-theme="dark"] {
+    display: block;
   }
 </style>

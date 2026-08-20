@@ -23,22 +23,45 @@ export const NAVIGATION = [
   { href: "/resources", label: "Resources" },
 ]
 
-export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
-  { href: "https://github.com/rybplayer", label: "GitHub", icon: GitHub },
-  {
+export type SocialLink = {
+  href: string
+  label: string
+  icon: SvgComponent
+}
+
+export const SOCIAL_LINKS = {
+  github: {
+    href: "https://github.com/rybplayer",
+    label: "GitHub",
+    icon: GitHub,
+  },
+  scholar: {
     href: "https://scholar.google.com/citations?user=CeLsaNIAAAAJ&hl=en&oi=ao",
     label: "Google Scholar",
     icon: GoogleScholar,
   },
-  {
+  linkedin: {
     href: "https://linkedin.com/in/ryanbatubara",
     label: "LinkedIn",
     icon: LinkedIn,
   },
-  {
+  email: {
     href: "mailto:ryan.y.batubara@gmail.com",
     label: "Email",
     icon: Email,
   },
-  { href: "/rss.xml", label: "RSS", icon: RSS },
-]
+  rss: { href: "/rss.xml", label: "RSS", icon: RSS },
+} as const satisfies Record<string, SocialLink>
+
+export type SocialKey = keyof typeof SOCIAL_LINKS
+
+export const getSocialLinks = (keys: readonly SocialKey[]): SocialLink[] =>
+  keys.map((key) => SOCIAL_LINKS[key])
+
+export const SOCIALS = getSocialLinks([
+  "github",
+  "scholar",
+  "linkedin",
+  "email",
+  "rss",
+])

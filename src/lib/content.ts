@@ -71,20 +71,46 @@ export async function getProjects() {
   )
 }
 
-const words = (body: string | undefined) =>
-  (body ?? "")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/[`*_#$>{}[\]()+|\\-]/g, " ")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean).length
+const PROSE_WORDS_PER_MINUTE = 265
+const CODE_SECONDS_PER_LINE = 1
+const MAX_CODE_SECONDS_PER_BLOCK = 30
+
+const readingSeconds = (body: string | undefined) => {
+  let codeSeconds = 0
+  const prose = (body ?? "")
+    .replace(
+      /^ {0,3}(`{3,}|~{3,})[^\n]*\n([\s\S]*?)^ {0,3}\1[ \t]*$/gm,
+      (_, _fence: string, code: string) => {
+        const lines = code.split("\n").filter((line) => line.trim()).length
+        codeSeconds += Math.min(
+          MAX_CODE_SECONDS_PER_BLOCK,
+          lines * CODE_SECONDS_PER_LINE,
+        )
+        return " "
+      },
+    )
+    .replace(/^import\s.+$/gm, " ")
+    .replace(/<([A-Z][\w.]*)\b[\s\S]*?\/>/g, " ")
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/\$\$[\s\S]*?\$\$/g, " equation ")
+    .replace(/\$[^\n$]+\$/g, " equation ")
+    .replace(/(`+)[\s\S]*?\1/g, " code ")
+    .replace(/<\/?[^>]+>/g, " ")
+    .replace(/\{[^{}]*\}/g, " ")
+    .replace(/https?:\/\/\S+/g, " ")
+  const proseWords =
+    prose.match(/[\p{L}\p{N}]+(?:[’'\-.][\p{L}\p{N}]+)*/gu)?.length ?? 0
+  return (proseWords / PROSE_WORDS_PER_MINUTE) * 60 + codeSeconds
+}
 
 export const readingTime = (
   entries: { body?: string } | { body?: string }[],
 ) => {
-  const count = (Array.isArray(entries) ? entries : [entries]).reduce(
-    (sum, entry) => sum + words(entry.body),
+  const seconds = (Array.isArray(entries) ? entries : [entries]).reduce(
+    (sum, entry) => sum + readingSeconds(entry.body),
     0,
   )
-  return `${Math.max(1, Math.ceil(count / 200))} min read`
+  return `${Math.max(1, Math.ceil(seconds / 60))} min read`
 }
