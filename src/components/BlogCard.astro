@@ -1,107 +1,168 @@
 ---
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { cardVariants } from '@/lib/card-variants'
-import {
-  getCombinedReadingTime,
-  getSubpostCount,
-  isSubpost,
-  parseAuthors,
-} from '@/lib/data-utils'
-import { cn, formatDate } from '@/lib/utils'
-import { Icon } from 'astro-icon/components'
-import { Image } from 'astro:assets'
-import type { CollectionEntry } from 'astro:content'
-import Link from './Link.astro'
+import { readingTime } from "@/lib/content"
+import { formatDate } from "@/lib/utils"
+import { Image } from "astro:assets"
+import { getEntries, type CollectionEntry } from "astro:content"
 
-interface Props {
-  entry: CollectionEntry<'blog'>
-  isFirst?: boolean
-  disableHover?: boolean
-}
+type Post = CollectionEntry<"blog">
+type Props = { post: Post; entries?: Post[] }
 
-const { entry, isFirst = false, disableHover = false } = Astro.props
-const formattedDate = formatDate(entry.data.date)
-const readTime = await getCombinedReadingTime(entry.id)
-const authors = parseAuthors(entry.data.authors ?? [])
-const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
+const { post, entries = [post] } = Astro.props
+const authors = await getEntries(post.data.authors)
+const cardImage = post.data.previewImage ?? post.data.image
+const lightCardImage = post.data.image
+const darkCardImage = post.data.previewImage
 ---
 
-<div
-  class={cn(
-    cardVariants({
-      variant: 'default',
-      hover: disableHover ? 'disabled' : 'enabled',
-    }),
-  )}
->
-  <Link
-    href={`/${entry.collection}/${entry.id}`}
-    class="flex flex-col gap-4 sm:flex-row"
-  >
-    {
-      entry.data.image && (
-        <div class="relative w-full border sm:max-w-3xs sm:shrink-0">
-          <div class="bg-accent absolute inset-0" aria-hidden="true" />
-          <Image
-            src={entry.data.image}
-            alt={entry.data.title}
-            width={1200}
-            widths={[128, 256, 512]}
-            height={630}
-            loading={isFirst ? 'eager' : 'lazy'}
-            fetchpriority={isFirst ? 'high' : undefined}
-            class="relative z-10 object-cover"
-          />
-        </div>
-      )
+<li>
+  {cardImage && (
+      <a href={`/blog/${post.id}`} tabindex="-1" aria-hidden="true">
+        {lightCardImage && darkCardImage ? (
+          <>
+            <Image data-card-theme="light" src={lightCardImage} alt="" width={640} height={336} />
+            <Image data-card-theme="dark" src={darkCardImage} alt="" width={640} height={336} />
+          </>
+        ) : (
+          <Image src={cardImage} alt="" width={640} height={336} />
+        )}
+      </a>
+    )}
+  <entry-info>
+    <a href={`/blog/${post.id}`}>{post.data.title}</a>
+    <entry-meta>
+      {authors.length > 0 && (
+          <entry-authors>
+            <author-names>
+              {authors.map((author, i) => (
+                <>{i > 0 && ", "}<a href={`/authors/${author.id}`}>{author.data.name}</a></>
+              ))}
+            </author-names>
+          </entry-authors>
+        )}
+      <time datetime={post.data.date.toISOString()}
+        >{formatDate(post.data.date)}</time
+      >
+      <span>· {readingTime(entries)}</span>
+      {post.data.tags && (
+          <entry-tags>
+            {post.data.tags.map((tag) => (
+              <span>#{tag}</span>
+            ))}
+          </entry-tags>
+        )}
+    </entry-meta>
+    <p>{post.data.description}</p>
+  </entry-info>
+</li>
+
+<style>
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-s);
+
+    > a {
+      flex-shrink: 0;
+      inline-size: 14rem;
+      overflow: hidden;
+      background-color: var(--accent);
+
+      :global(img) {
+        inline-size: 100%;
+        block-size: auto;
+      }
+
+      [data-card-theme="dark"] {
+        display: none;
+      }
     }
 
-    <div class="grow">
-      <h3 class="mb-1 text-lg font-semibold">{entry.data.title}</h3>
-      <p class="text-muted-foreground mb-2 text-sm">{entry.data.description}</p>
+    entry-info {
+      display: flex;
+      flex-direction: column;
 
-      <div
-        class="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-2 text-xs"
-      >
-        {
-          authors.length > 0 && (
-            <>
-              {authors.map((author) => (
-                <span>{author.name}</span>
-              ))}
-              <Separator orientation="vertical" className="h-4!" />
-            </>
-          )
-        }
-        <span>{formattedDate}</span>
-        <Separator orientation="vertical" className="h-4!" />
-        <span>{readTime}</span>
-        {
-          subpostCount > 0 && (
-            <>
-              <Separator orientation="vertical" className="h-4!" />
-              <span class="flex items-center gap-1">
-                <Icon name="lucide:file-text" class="size-3" />
-                {subpostCount} subpost{subpostCount === 1 ? '' : 's'}
-              </span>
-            </>
-          )
-        }
-      </div>
-
-      {
-        entry.data.tags && (
-          <div class="flex flex-wrap gap-2">
-            {entry.data.tags.map((tag) => (
-              <Badge variant="secondary" className="flex items-center gap-x-1">
-                <Icon name="lucide:hash" class="size-3" />
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )
+      > a {
+        font-size: var(--step-1);
+        line-height: calc(var(--leading-offset) + 1em);
+        font-weight: var(--font-weight-medium);
       }
-    </div>
-  </Link>
-</div>
+
+      entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3xs);
+        margin-block-end: var(--space-3xs);
+        font-size: var(--step--1);
+        color: var(--muted-foreground);
+
+        entry-authors {
+          display: flex;
+          align-items: center;
+
+          a {
+            color: inherit;
+          }
+        }
+
+        entry-authors ~ time::before {
+          content: "·";
+          margin-inline-end: var(--space-3xs);
+        }
+
+        entry-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--space-3xs);
+
+          span {
+            color: color-mix(
+              in oklab,
+              var(--muted-foreground) 50%,
+              transparent
+            );
+          }
+        }
+
+        time ~ entry-tags::before {
+          content: "·";
+        }
+      }
+
+      p {
+        color: var(--muted-foreground);
+      }
+    }
+
+    @media (width < 40rem) {
+      flex-direction: column;
+
+      > a {
+        inline-size: 100%;
+        max-inline-size: 32rem;
+      }
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    [data-card-theme="light"] {
+      display: none;
+    }
+    [data-card-theme="dark"] {
+      display: block;
+    }
+  }
+
+  :global(:root[data-theme="light"]) [data-card-theme="light"] {
+    display: block;
+  }
+  :global(:root[data-theme="light"]) [data-card-theme="dark"] {
+    display: none;
+  }
+  :global(:root[data-theme="dark"]) [data-card-theme="light"] {
+    display: none;
+  }
+  :global(:root[data-theme="dark"]) [data-card-theme="dark"] {
+    display: block;
+  }
+</style>

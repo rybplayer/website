@@ -1,0 +1,78 @@
+---
+import SocialIcons from "@/components/SocialIcons.astro"
+import { getSocialLinks } from "@/consts"
+import { normalizePath } from "@/lib/utils"
+import type { CollectionEntry } from "astro:content"
+
+type Props = { author: CollectionEntry<"authors"> }
+
+const { author } = Astro.props
+const { name, pronouns, avatar, bio, socials } = author.data
+const links = getSocialLinks(socials ?? [])
+
+const href = `/authors/${author.id}`
+const isCurrent = normalizePath(Astro.url.pathname) === href
+---
+
+<li>
+  {isCurrent ? (
+      <img src={avatar} alt={name} width="64" height="64" />
+    ) : (
+      <a href={href} tabindex="-1" aria-hidden="true">
+        <img src={avatar} alt="" width="64" height="64" />
+      </a>
+    )}
+  <author-info>
+    <author-name>
+      {isCurrent ? name : <a href={href}>{name}</a>}
+      {pronouns && <author-pronouns>{pronouns}</author-pronouns>}
+    </author-name>
+    {bio && <p>{bio}</p>}
+    {links.length > 0 && <SocialIcons links={links} />}
+  </author-info>
+</li>
+
+<style>
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-s);
+
+    > a {
+      flex-shrink: 0;
+    }
+
+    img {
+      flex-shrink: 0;
+      border-radius: var(--radius-full);
+    }
+
+    author-info {
+      display: flex;
+      flex-direction: column;
+
+      author-name {
+        font-size: var(--step-1);
+        line-height: calc(var(--leading-offset) + 1em);
+        font-weight: var(--font-weight-medium);
+        margin-block-start: -0.2em;
+
+        author-pronouns {
+          margin-inline-start: var(--space-3xs);
+          font-size: var(--step--1);
+          font-weight: var(--font-weight-normal);
+          color: var(--muted-foreground);
+        }
+      }
+
+      p {
+        color: var(--muted-foreground);
+        margin-block-end: var(--space-3xs);
+      }
+    }
+
+    @media (width < 40rem) {
+      flex-direction: column;
+    }
+  }
+</style>

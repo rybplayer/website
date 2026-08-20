@@ -1,20 +1,61 @@
----
-
----
-
-<span class="spoiler" onclick="this.classList.toggle('revealed')"><slot /></span
+<span
+  role="button"
+  tabindex="0"
+  class="spoiler"
+  aria-label="Reveal spoiler"
+  aria-pressed="false"
+  ><slot /></span
 >
 
 <style>
   .spoiler {
-    background-color: oklch(from var(--foreground) l c h / 0.3);
+    display: inline;
+    padding-inline: 0.2em;
+    border: 0;
+    border-radius: var(--radius-sm);
     color: transparent;
+    background: color-mix(in oklab, var(--foreground) 30%, transparent);
     cursor: pointer;
-    padding: 0 0.2em;
-    border-radius: 0.2em;
+    text-align: inherit;
+    user-select: text;
   }
-  .spoiler.revealed {
-    background-color: transparent;
+  .spoiler[data-revealed] {
     color: inherit;
+    background: transparent;
+  }
+  .spoiler:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 </style>
+
+<script>
+  for (const spoiler of document.querySelectorAll<HTMLElement>(
+    ".spoiler:not([data-ready])",
+  )) {
+    spoiler.dataset.ready = ""
+    const toggle = () => {
+      const revealed = spoiler.toggleAttribute("data-revealed")
+      spoiler.setAttribute("aria-pressed", String(revealed))
+      spoiler.setAttribute(
+        "aria-label",
+        revealed ? "Hide spoiler" : "Reveal spoiler",
+      )
+    }
+    spoiler.addEventListener("click", () => {
+      const selection = getSelection()
+      if (
+        selection &&
+        !selection.isCollapsed &&
+        selection.containsNode(spoiler, true)
+      )
+        return
+      toggle()
+    })
+    spoiler.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return
+      event.preventDefault()
+      toggle()
+    })
+  }
+</script>

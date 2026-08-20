@@ -1,0 +1,61 @@
+import { assertLinkIconAsset, linkIconForUrl } from "@/lib/link-icons"
+import type { ElementContent } from "hast"
+import { defineHastPlugin } from "satteri"
+
+const containsMedia = (children: readonly ElementContent[]): boolean =>
+  children.some(
+    (child) =>
+      child.type === "element" &&
+      (["img", "svg", "picture", "video"].includes(child.tagName) ||
+        containsMedia(child.children)),
+  )
+
+const icon = (asset: string) => ({
+  type: "element" as const,
+  tagName: "span",
+  properties: {
+    "aria-hidden": "true",
+    "data-favicon": "",
+    "data-favicon-position": "after",
+    "data-favicon-icon": asset,
+    style: `--favicon-mask:url("${assertLinkIconAsset(asset)}")`,
+  },
+  children: [],
+})
+
+export const linkFavicons = defineHastPlugin({
+  name: "link-favicons",
+  element: {
+    filter: ["a"],
+    visit(node, ctx) {
+      const href = node.properties.href
+      if (typeof href !== "string" || !/^https?:\/\//.test(href)) return
+      if (containsMedia(node.children)) return
+
+      const favicon = icon(linkIconForUrl(href))
+      const lastIndex = node.children.length - 1
+      const last = node.children[lastIndex]
+      const suffix =
+        last?.type === "text" ? /(\S{1,8})(\s*)$/u.exec(last.value) : undefined
+
+      if (last?.type === "text" && suffix) {
+        const before = last.value.slice(0, suffix.index)
+        ctx.removeChildAt(node, lastIndex)
+        ctx.appendChild(node, [
+          ...(before ? [{ type: "text" as const, value: before }] : []),
+          {
+            type: "element" as const,
+            tagName: "span",
+            properties: { "data-favicon-glue": "" },
+            children: [{ type: "text" as const, value: suffix[1] }, favicon],
+          },
+          ...(suffix[2] ? [{ type: "text" as const, value: suffix[2] }] : []),
+        ])
+        return
+      }
+
+      if (last?.type === "element") ctx.appendChild(last, favicon)
+      else ctx.appendChild(node, favicon)
+    },
+  },
+})

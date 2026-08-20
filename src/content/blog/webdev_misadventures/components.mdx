@@ -3,32 +3,29 @@ title: 'Components'
 description: 'Callouts, widgets, and others. Reusable ploppables.'
 date: 2025-12-22
 tags: ['programming']
-authors: ['Ryan Batubara']
-icon: 'lucide:cuboid'
+authors: ['ryan-batubara']
+order: 3
 ---
 
 import CalloutShowcase from '@/components/CalloutShowcase.astro'
-import Callout from '@/components/Callout.astro'
 import AbcNotation from '@/components/AbcNotation.astro'
-import LogicPuzzle from '@/components/LogicGrid'
+import LogicPuzzle from '@/components/LogicGrid.astro'
 
 ## How to use components
 
-Within any `.mdx`, import the component and pass in the required parameters. For example, here's how to add a `<Callout>` component.
+Within any `.mdx`, import a custom component and pass in the required parameters. Callouts are lighter-weight Satteri directives and need no import:
 
 ```mdx
-import Callout from '@/components/Callout.astro'
-
-<Callout title="About callouts" variant="important" defaultOpen={false}>
+:::important[About callouts]{closed}
   Callouts signify different types of content to the reader
-</Callout>
+:::
 ```
 
-Here's how it looks rendered. Notice `defaultOpen={false}` makes the callout closed by default, ideal for e.g. solutions to puzzles.
+Here's how it looks rendered. Notice the `closed` attribute makes the callout closed by default, ideal for e.g. solutions to puzzles.
 
-<Callout title="About callouts" variant="important" defaultOpen={false}>
+:::important[About callouts]{closed}
   Callouts signify different types of content to the reader
-</Callout>
+:::
 
 I can then call out the component as a [hyperlink](#about-callouts). Here's how this line looks in code:
 
@@ -36,7 +33,7 @@ I can then call out the component as a [hyperlink](#about-callouts). Here's how 
 I can then call out the component as a [hyperlink](#about-callouts).
 ```
 
-By default, the callout's `id` is just its slugified title, but a custom `id` can be passed in too.
+By default, the callout's `id` is its slugified title, but an explicit directive ID can be supplied too.
 
 ## Callouts
 
@@ -62,7 +59,6 @@ Sidenote: [abcjs](https://www.abcjs.net/) can actually compile sheets to audio, 
 Here's a logic grid component for my post [Logic Grids as Data Structures](/blog/logic-grids-as-data-structures):
 
 <LogicPuzzle
-  client:only="react"
   id="example-logic-grid"
   cellSize={30}
   categories={[

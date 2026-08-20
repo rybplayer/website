@@ -5,12 +5,11 @@ date: 2025-12-21
 tags: ['puzzle']
 image: './logic-grids-as-data-structures.svg'
 previewImage: './logic_grids_as_ds_preview.webp'
-authors: ['Ryan Batubara']
+authors: ['ryan-batubara']
 ---
 
-import LogicPuzzle from '@/components/LogicGrid'
+import LogicPuzzle from '@/components/LogicGrid.astro'
 import Spoiler from '@/components/Spoiler.astro'
-import Callout from '@/components/Callout.astro'
 import KeyDeductions from './KeyDeductions.webp'
 import GardenPlots from './GardenPlots.webp'
 import Montague from './Montague.webp'
@@ -19,7 +18,7 @@ import Montague from './Montague.webp'
 
 [Logic grids](https://logic.puzzlebaron.com/) are one of those things that best explained by starting with an example.
 
-<Callout title="An example logic grid puzzle" variant="puzzle">
+:::puzzle[An example logic grid puzzle]
 
 A logic grid typically presents a list of clues, such as:
 
@@ -31,7 +30,6 @@ A logic grid typically presents a list of clues, such as:
 These clues would be accompanied by a grid:
 
 <LogicPuzzle
-  client:only="react"
   id="birthday-puzzle"
   cellSize={30}
   categories={[
@@ -41,19 +39,19 @@ These clues would be accompanied by a grid:
   ]}
 />
 
-</Callout>
+:::
 
 The player would then put ticks and crosses on the grid, solving for the birthdays and ages for all three characters. Of course, this is only possible if we assume all three characters have distinct birth months and ages; this assumption is usually implied in logic grids.
 
 Note that the above grid is **functional**; press the boxes to turn empty cells into crosses, crosses into ticks, and ticks back into empty cells. You can drag click too. Feel free to try it out! Open the following callout to reveal the solution:
 
-<Callout title="Example logic grid solution" variant="solution" defaultOpen={false}>
+:::solution[Example logic grid solution]{closed}
 
 Amy is 8 and born in April. \
 Bintang is 7 and born in January. \
 Chandra is 9 and born in September
 
-</Callout>
+:::
 
 ## Formal description
 
@@ -63,7 +61,7 @@ For example, the [previous puzzle](#an-example-logic-grid-puzzle) has 3 categori
 
 Interestingly, logic grids are solvable in [polynomial time](https://en.wikipedia.org/wiki/Time_complexity), given "simple" clues, and other constraints! In fact, some solvers like [this paper](https://arxiv.org/pdf/1910.06636) can give provably correct, human-like reasoning for the solution, still in polynomial time!
 
-<Callout title="What about brute force?">
+:::note[What about brute force?]
 
 Note that if you have $c$ categories each with $n$ elements, there are
 
@@ -78,7 +76,7 @@ possible bijections to brute force, since
 
 In other words, polynomial time is quite efficient!
 
-</Callout>
+:::
 
 ## Useless logic grids?
 
@@ -104,11 +102,11 @@ If you knew all 5 above statements were true, you know so much about the problem
 
 Logic grids may have a lot of constraints, but they're useful for solving puzzles that satisfies those constraints. Even when the puzzle does not look like it can be solved with a logic grid. For example, consider the following problem:
 
-<Callout title="Key deductions" variant="puzzle">
+:::puzzle[Key deductions]
 
 You are given 12 locked boxes. They all require different keys to be opened, and there are no duplicate keys.
 
-<img src={KeyDeductions.src} class="w-[clamp(250px,600px)] py-6 dark:invert" />
+<img src={KeyDeductions.src} class="content-illustration invert-in-dark" style="--content-max: 400px" />
 
 You are given keys to boxes 1, 2, and 3, which are not in any other box. Besides boxes 1, 2, and 3, 6 of the other boxes contain a single key, while two of the remaining contain nothing and the third a prize.
 
@@ -116,7 +114,7 @@ You are given keys to boxes 1, 2, and 3, which are not in any other box. Besides
 
 This puzzle was taken from [_Return to Montague Island_, puzzle 1.1](https://www.amazon.com/Return-Montague-Island-Mysteries-Puzzles/dp/1454933933) by R. W. Schmittberger.
 
-</Callout>
+:::
 
 Personally, a lot of the difficulty of this puzzle comes from figuring out how to effectively structure the given information. It's tempting to create a graph with 12 vertices, whose directed edges represent the potential keys. Perhaps, some sort of graph traversal can get us the answer.
 
@@ -124,12 +122,11 @@ Unfortunately, this graph strategy doesn't work so easily. In particular, since 
 
 Perhaps there is a more clever graph representation and algorithm for this problem. But as we'll soon see, logic grids make problem feel trivial. Please open the callout below to see the logic grid solution:
 
-<Callout title="Key deductions solution" variant="solution" defaultOpen={false}>
+:::solution[Key deductions solution]{closed}
 
 Construct the following grid:
 
 <LogicPuzzle
-  client:only="react"
   id="key-deductions"
   cellSize={30}
   categories={[
@@ -171,9 +168,9 @@ Put crosses on every cell that violates the clues on the boxes. Doing so, you ma
 It's a lot of steps, but many of them (especially step 1) become trivially obvious with the logic grid. Furthermore, you can actually save space by constructing the following grid:
 
 <LogicPuzzle
-  client:only="react"
   id="key-deductions-minimal"
   cellSize={30}
+  cellHeight={80}
   categories={[
     ['Boxes', Array.from({ length: 12 }, (_, i) => `${i + 1}`)],
     ['Contents', ['contents']],
@@ -196,11 +193,11 @@ It's a lot of steps, but many of them (especially step 1) become trivially obvio
 
 Namely, fill each cell with the two possible outcomes of each box, and cross out the ones you deduce are incorrect.
 
-</Callout>
+:::
 
 # Useless logic grids
 
-<Callout title="Who's the liar?" variant="puzzle">
+:::puzzle[Who's the liar?]
 
 Fatima and Amara come from a land where
 some always tell the truth, and the rest always lie.
@@ -209,12 +206,11 @@ Amara says, “Either Fatima lies, or I am truthful.”
 
 Are Fatima and/or Amara liars?
 
-</Callout>
+:::
 
 Usually, we solve puzzles like this using a truth table. Can we use a logic grid? What should the grid be? Something like this?
 
 <LogicPuzzle
-  client:only="react"
   id="whos-the-liar-1"
   cellSize={30}
   categories={[
@@ -227,7 +223,6 @@ Usually, we solve puzzles like this using a truth table. Can we use a logic grid
 Or maybe something like this?
 
 <LogicPuzzle
-  client:only="react"
   id="whos-the-liar-2"
   cellSize={30}
   categories={[
@@ -245,8 +240,7 @@ Or maybe something like this?
 Solution spoiler alert! Fatima is <Spoiler>truthful</Spoiler> and Amara is <Spoiler>truthful</Spoiler>. So can't we just do:
 
 <LogicPuzzle
-  client:only="react"
-  id="whos-the-liar-1"
+  id="whos-the-liar-solution"
   cellSize={30}
   categories={[
     ['Name', ['Fatima', 'Amara']],
@@ -276,7 +270,7 @@ Interestingly, the logic grid remains an incredibly effective way to encode info
 
 For example, here's the grid for [_Montague Island Mysteries_, puzzle 4.4](https://www.amazon.com/Montague-Island-Mysteries-Other-Puzzles/dp/145491811X) that I solved the other day:
 
-<img src={GardenPlots.src} class="w-[clamp(200px,600px)] dark:invert" />
+<img src={GardenPlots.src} class="content-illustration invert-in-dark" style="--content-max: 600px" />
 
 # Lying logic grids
 
@@ -296,7 +290,7 @@ We try to relax 3, 4, 5:
 
 Let's explore what these mean through a puzzle.
 
-<Callout title="Murder mystery" variant="puzzle">
+:::puzzle[Murder mystery]
 
 A murder has occurred! Alistair the butler is innocent, but one of the staff and one of the guests are guilty! The guilty party's statements cannot be trusted. All other statements are true!
 
@@ -320,21 +314,22 @@ A murder has occurred! Alistair the butler is innocent, but one of the staff and
 
 This puzzle is from [_Montague Island Mysteries_, puzzle 12.4](https://www.amazon.com/Montague-Island-Mysteries-Other-Puzzles/dp/145491811X).
 
-</Callout>
+:::
 
 At first glance, this puzzle looks daunting. There are 12 different parties. Each of them gives up to two statements, and these statements involve "and", "or", and "if." It feels like there's no solid ground to start on.
 
-At this point, you've probably guessed that logic grids can be used to solve this problem. This is a post about logic grids, after all. Indeed, a _very_ clever logic grid can be used to solve this problem. Here's a pretty big hint: <Spoiler> If a statement is corroborated by two or more guests (or staff, respectively), it must be true. </Spoiler>
+At this point, you've probably guessed that logic grids can be used to solve this problem. This is a post about logic grids, after all. Indeed, a _very_ clever logic grid can be used to solve this problem. Here's a pretty big hint:
+
+<p><Spoiler>If a statement is corroborated by two or more guests (or staff, respectively), it must be true.</Spoiler></p>
 
 Please expand the callout below for the full solution.
 
-<Callout title="Murder mystery solution" variant="solution" defaultOpen={false}>
+:::solution[Murder mystery solution]{closed}
 
 Construct the following grid:
 
 <LogicPuzzle
-  client:only="react"
-  id="key-deductions"
+  id="murder-mystery"
   cellSize={30}
   categories={[
     ['Staff', ['Evelyn', 'Grant', 'Lyle', 'Molly', 'Sandy']],
@@ -350,7 +345,7 @@ Doing this repeatedly will reveal other certainly innocent staff and guests. In 
 
 We can generalize this technique; If there are $k$ liars in a category, find all claims corroborated by $k+1$ claims in the category. Repeat this, taking account of any new information deduced.
 
-</Callout>
+:::
 
 I hope you found the above puzzle as interesting and fun as I do. I honestly think it's a really elegant trick, but one question did linger for me: What if the number of liars is unknown?
 
@@ -370,7 +365,7 @@ Let's try to relax 3 further:
 
 Once again, lets explore what the new condition 3 means through an example.
 
-<Callout title="Pilfer puzzle" variant="puzzle">
+:::puzzle[Pilfer puzzle]
 
 A robbery has occurred in the same mansion! Fewer than 4 guests were the thieves. Their statements may be true or false. All other statements are true! Police investigation has also shown that neither Danny nor Brianna makes a true statement unless he or she is innocent.
 
@@ -384,7 +379,7 @@ A robbery has occurred in the same mansion! Fewer than 4 guests were the thieves
 
 This puzzle is from [_Beyond Montague Island_, puzzle 9.1](https://www.amazon.com/Beyond-Montague-Island-Mysteries-Puzzles/dp/1454936592).
 
-</Callout>
+:::
 
 Here are some hints:
 
@@ -397,7 +392,7 @@ Here are some hints:
 
 Please expand the callout below for the full solution.
 
-<Callout title="Pilfer puzzle solution" variant="solution" defaultOpen={false}>
+:::solution[Pilfer puzzle solution]{closed}
 
 Consider the bolded parts below:
 
@@ -413,7 +408,7 @@ By proof of contradiction, there are **three thieves**, else there are more fals
 
 Notice what we just did: We first tried to map the problem into a type of logic grid we knew how to solve, i.e. known number of liars logic grids. At that point, we can just reuse previous techniques to solve the problem.
 
-</Callout>
+:::
 
 # Conclusions
 
@@ -430,7 +425,8 @@ Many of the puzzles from this talk come from the following books:
 <a href="https://www.hachettebookgroup.com/series/r-wayne-schmittberger/montague-island-mysteries/">
   <img
     src={Montague.src}
-    class="w-[clamp(200px,400px)]"
+    class="content-illustration"
+    style="--content-max: 400px"
     alt="Montague Island Puzzle Book Series"
   />
 </a>

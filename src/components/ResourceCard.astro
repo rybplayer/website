@@ -1,66 +1,95 @@
 ---
-import Link from '@/components/Link.astro'
-import { Badge } from '@/components/ui/badge'
-import { cardVariants } from '@/lib/card-variants'
-import { cn } from '@/lib/utils'
-import { Image } from 'astro:assets'
-import type { CollectionEntry } from 'astro:content'
+import ExternalIcon from "@/assets/icons/external.svg"
+import { readingTime } from "@/lib/content"
+import { formatDate } from "@/lib/utils"
+import { Image } from "astro:assets"
+import type { CollectionEntry } from "astro:content"
 
-interface Props {
-  resource: CollectionEntry<'resources'>
-  disableHover?: boolean
-}
+type Props = { resource: CollectionEntry<"resources"> }
 
-const { resource, disableHover = false } = Astro.props
-const bodyText = resource.body?.trim() ?? ''
-const externalLink = resource.data.link
-const hasExternalLink = !!externalLink && bodyText.length === 0
-const href =
-  hasExternalLink && externalLink ? externalLink : `/resources/${resource.id}`
+const { resource } = Astro.props
+const externalOnly = Boolean(resource.data.link && !resource.body?.trim())
+const href = externalOnly ? resource.data.link! : `/resources/${resource.id}`
+const image = resource.data.previewImage ?? resource.data.image
 ---
 
-<div
-  class={cn(
-    cardVariants({
-      variant: 'default',
-      hover: disableHover ? 'disabled' : 'enabled',
-    }),
+<li>
+  {image && (
+    <a href={href} tabindex="-1" aria-hidden="true">
+      <Image src={image} alt="" width={640} height={336} />
+    </a>
   )}
->
-  <Link
-    href={href}
-    class="flex flex-col gap-4 sm:flex-row"
-    external={hasExternalLink}
-  >
-    {
-      resource.data.image && (
-        <div class="w-full border sm:max-w-3xs sm:shrink-0">
-          <Image
-            src={resource.data.image}
-            alt={resource.data.title}
-            width={1200}
-            widths={[128, 256, 512]}
-            height={630}
-            class="object-cover"
-          />
-        </div>
-      )
-    }
-    <div class="grow">
-      <h3 class="mb-1 text-lg font-semibold">{resource.data.title}</h3>
-      <p class="text-muted-foreground mb-2 text-sm">
-        {resource.data.description}
-      </p>
-      {
-        resource.data.tags && (
-          <div class="flex flex-wrap gap-2">
-            {resource.data.tags.map((tag: string) => (
-              <Badge variant="secondary">{tag}</Badge>
-            ))}
-          </div>
-        )
-      }
-    </div>
-  </Link>
-</div>
+  <entry-info>
+    <a
+      href={href}
+      target={externalOnly ? "_blank" : undefined}
+      rel={externalOnly ? "noopener noreferrer" : undefined}
+    >
+      {resource.data.title}
+      {externalOnly && <ExternalIcon aria-hidden="true" />}
+    </a>
+    <entry-meta>
+      <time datetime={resource.data.date.toISOString()}
+        >{formatDate(resource.data.date)}</time
+      >
+      {!externalOnly && <span>· {readingTime(resource)}</span>}
+      {resource.data.tags?.map((tag) => <span>#{tag}</span>)}
+    </entry-meta>
+    <p>{resource.data.description}</p>
+  </entry-info>
+</li>
 
+<style>
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-s);
+  }
+  li > a {
+    flex-shrink: 0;
+    inline-size: 14rem;
+  }
+  li > a :global(img) {
+    inline-size: 100%;
+    block-size: auto;
+  }
+  entry-info {
+    display: flex;
+    flex-direction: column;
+  }
+  entry-info > a {
+    display: flex;
+    gap: var(--space-3xs);
+    align-items: center;
+    font-size: var(--step-1);
+    line-height: calc(var(--leading-offset) + 1em);
+    font-weight: var(--font-weight-medium);
+  }
+  entry-info > a :global(svg) {
+    inline-size: 1em;
+    block-size: 1em;
+  }
+  entry-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-end: var(--space-3xs);
+    font-size: var(--step--1);
+    color: var(--muted-foreground);
+  }
+  entry-meta span:last-child {
+    color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+  }
+  p {
+    color: var(--muted-foreground);
+  }
+  @media (width < 40rem) {
+    li {
+      flex-direction: column;
+    }
+    li > a {
+      inline-size: 100%;
+      max-inline-size: 32rem;
+    }
+  }
+</style>

@@ -1,23 +1,13 @@
 ---
-import { calloutConfig, type CalloutVariant } from '@/lib/callout-config'
-import Callout from './Callout.astro'
-
-interface Props {
-  variants?: CalloutVariant[]
-  class?: string
-}
-
-const { variants, class: className } = Astro.props
-
-const entries = variants
-  ? variants.map((v) => [v, calloutConfig[v]] as const)
-  : (Object.entries(calloutConfig) as [
-      CalloutVariant,
-      (typeof calloutConfig)[CalloutVariant],
-    ][])
+import { CALLOUTS, type CalloutVariant } from "@/lib/callout-config"
+type Props = { variants?: CalloutVariant[] }
+const { variants } = Astro.props
+const entries = (variants ?? (Object.keys(CALLOUTS) as CalloutVariant[])).map(
+  (name) => [name, CALLOUTS[name]] as const,
+)
 ---
 
-<div class:list={['[&_td]:align-middle', className]}>
+<div class="showcase">
   <table>
     <thead>
       <tr>
@@ -26,16 +16,29 @@ const entries = variants
       </tr>
     </thead>
     <tbody>
-      {
-        entries.map(([name, config]) => (
-          <tr>
-            <td>
-              <Callout variant={name} tag />
-            </td>
-            <td>{config.desc}</td>
-          </tr>
-        ))
-      }
+      {entries.map(([name, config]) => <tr><td><span style={`--accent:${config.accent}`}>{name}</span></td><td>{config.description}</td></tr>)}
     </tbody>
   </table>
 </div>
+
+<style>
+  .showcase {
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+  table {
+    inline-size: 100%;
+  }
+  td {
+    vertical-align: middle;
+  }
+  td span {
+    display: inline-block;
+    padding: var(--space-3xs) var(--space-2xs);
+    color: light-dark(
+      oklch(from var(--accent) 0.45 c h),
+      oklch(from var(--accent) 0.83 calc(c * 0.5) h)
+    );
+    border-inline-start: 4px solid var(--accent);
+  }
+</style>

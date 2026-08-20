@@ -1,21 +1,29 @@
 ---
-import PageHead from '@/components/PageHead.astro'
-import ProjectCard from '@/components/ProjectCard.astro'
-import Layout from '@/layouts/Layout.astro'
-import { getAllProjects } from '@/lib/data-utils'
+import MetaPage from "@/components/MetaPage.astro"
+import ProjectCard from "@/components/ProjectCard.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getProjects } from "@/lib/content"
 
-const projects = await getAllProjects()
+const projects = await getProjects()
 ---
 
-<Layout class="max-w-3xl">
-  <PageHead slot="head" title="Projects" />
-
-  <section>
-    <div class="min-w-full">
-      <h2 class="mb-4 text-2xl font-medium">Projects</h2>
-      <div class="flex flex-col gap-4">
-        {projects.map((project) => <ProjectCard project={project} />)}
-      </div>
-    </div>
-  </section>
+<Layout crumbs={[{ label: "Projects", href: "/projects" }]}>
+  <MetaPage slot="head" title="Projects" />
+  <h1>Projects</h1>
+  <ul>
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </ul>
 </Layout>
+
+<style>
+  h1 {
+    font-size: var(--step-3);
+    font-weight: var(--font-weight-medium);
+    margin-block-end: var(--space-m);
+  }
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+</style>

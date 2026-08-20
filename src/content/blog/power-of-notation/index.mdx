@@ -5,12 +5,11 @@ date: 2025-12-20
 tags: ['music']
 image: './power-of-notation.svg'
 previewImage: './power_of_notation_preview.webp'
-authors: ['Ryan Batubara']
+authors: ['ryan-batubara']
 ---
 
 import AbcNotation from '@/components/AbcNotation.astro'
 import Felicidade from './Felicidade.svg'
-import Callout from '@/components/Callout.astro'
 
 # What is musical notation?
 
@@ -88,7 +87,7 @@ This creates a sort of tradeoff; you want the western notation for its precision
 
 One solution to this conundrum is to just stave the tabs:
 
-<img src={Felicidade.src} class="w-[clamp(250px,50%,600px)] dark:invert" />
+<img src={Felicidade.src} class="content-illustration invert-in-dark" style="--content-max: 600px; --content-width: 50%" />
 
 Personally, I think this is quite the elegant solution. However, it's really not as simple as it seems.
 
@@ -131,7 +130,7 @@ These experiences tell me that preference for notation is as much about context 
 
 On the other hand, many classical guitar transcribers actively advocate against the inclusion of tabs. Some of their arguments goes as follows:
 
-<Callout title="An argument against tabs" variant="remark">
+:::remark[An argument against tabs]
 Consider this passage:
 
 <AbcNotation
@@ -145,7 +144,7 @@ L:1/8
 
 The tab can deceive the player into thinking they are playing on beat. Furthermore, there is so much ink on the page the player may forget the staccato marks. The western notation forces players to slow down and consider fingerings that best suit them. That is, the tab gives a false illusion of mastery.
 
-</Callout>
+:::
 
 I think that there is a lot that can be learned from such arguments. At the same time, I think such arguments make a lot of underlying assumptions that not all players may agree with. In particular, what if the player just wanted to skim the music while sight-playing? This can certainly be done with just the western notation, but I think adding the tab will almost certainly speed up this process.
 
