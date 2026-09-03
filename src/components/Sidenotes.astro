@@ -1,0 +1,272 @@
+<aside class="sidenote-layer" aria-label="Footnotes"></aside>
+
+<script>
+  import { placeSidenotes } from "@/lib/sidenote-layout.js"
+  import { hashId } from "@/lib/utils"
+
+  type Note = {
+    element: HTMLElement
+    reference: HTMLAnchorElement
+    body: HTMLElement
+    toggle: HTMLButtonElement
+    focusables: HTMLElement[]
+  }
+
+  const findId = (scope: Element, id: string) =>
+    scope.querySelector<HTMLElement>(`[id="${CSS.escape(id)}"]`)
+
+  const rewriteCloneIds = (root: HTMLElement, prefix: string) => {
+    const ids = new Map<string, string>()
+    for (const element of root.querySelectorAll<HTMLElement>("[id]")) {
+      const previous = element.id
+      const next = `${prefix}-${previous}`
+      ids.set(previous, next)
+      element.id = next
+    }
+
+    const tokenAttributes = [
+      "aria-controls",
+      "aria-describedby",
+      "aria-labelledby",
+      "aria-owns",
+      "for",
+      "headers",
+    ]
+    for (const element of root.querySelectorAll<HTMLElement>("*")) {
+      const href = element.getAttribute("href")
+      if (href?.startsWith("#")) {
+        const replacement = ids.get(hashId(href))
+        if (replacement) element.setAttribute("href", `#${replacement}`)
+      }
+      for (const attribute of tokenAttributes) {
+        const value = element.getAttribute(attribute)
+        if (!value) continue
+        element.setAttribute(
+          attribute,
+          value
+            .split(/\s+/)
+            .map((token) => ids.get(token) ?? token)
+            .join(" "),
+        )
+      }
+    }
+  }
+
+  const cloneDefinition = (source: Element, index: number) => {
+    const body = document.createElement("div")
+    body.className = "sidenote-body"
+    body.id = `sidenote-body-${index + 1}`
+    body.append(...source.cloneNode(true).childNodes)
+
+    for (const backref of body.querySelectorAll("[data-footnote-backref]")) {
+      const parent = backref.parentElement
+      backref.remove()
+      if (
+        parent &&
+        parent !== body &&
+        !parent.querySelector("*") &&
+        !parent.textContent?.trim()
+      )
+        parent.remove()
+    }
+    rewriteCloneIds(body, `sidenote-copy-${index + 1}`)
+    return body
+  }
+
+  const collectNotes = (layer: HTMLElement): Note[] => {
+    const notes: Note[] = []
+    for (const scope of document.querySelectorAll("prose-content")) {
+      const definitions = scope.querySelector<HTMLElement>(".footnotes")
+      if (!definitions) continue
+
+      for (const reference of scope.querySelectorAll<HTMLAnchorElement>(
+        "a[data-footnote-ref]",
+      )) {
+        if (reference.closest(".footnotes") || !reference.id) continue
+        const source = findId(definitions, hashId(reference.hash))
+        if (!source) continue
+
+        const index = notes.length
+        const body = cloneDefinition(source, index)
+        const toggle = document.createElement("button")
+        toggle.className = "sidenote-marker"
+        toggle.type = "button"
+        toggle.textContent = reference.textContent?.trim() || `${index + 1}`
+        toggle.setAttribute(
+          "aria-label",
+          `Expand footnote ${toggle.textContent}`,
+        )
+        toggle.setAttribute("aria-controls", body.id)
+        toggle.setAttribute("aria-expanded", "false")
+
+        const element = document.createElement("article")
+        element.className = "sidenote"
+        element.id = `sidenote-${index + 1}`
+        element.dataset.footnoteFor = reference.id
+        element.append(toggle, body)
+        layer.append(element)
+
+        reference.setAttribute("aria-controls", element.id)
+        const focusables = [
+          ...body.querySelectorAll<HTMLElement>(
+            "a[href], button, input, select, textarea, [tabindex]",
+          ),
+        ]
+        for (const item of focusables) {
+          item.dataset.sidenoteTabindex = item.getAttribute("tabindex") ?? ""
+          item.tabIndex = -1
+        }
+        notes.push({ element, reference, body, toggle, focusables })
+      }
+    }
+    return notes
+  }
+
+  const setup = () => {
+    const layer = document.querySelector<HTMLElement>(".sidenote-layer")
+    if (!layer || layer.dataset.ready !== undefined) return
+    layer.dataset.ready = ""
+
+    const notes = collectNotes(layer)
+    if (notes.length === 0) return
+
+    const root = document.documentElement
+    const desktop = matchMedia("(width >= 64rem)")
+    let expanded = -1
+    let frame = 0
+
+    const setInteractive = (note: Note, enabled: boolean) => {
+      for (const item of note.focusables) {
+        if (!enabled) {
+          item.tabIndex = -1
+          continue
+        }
+        const previous = item.dataset.sidenoteTabindex
+        if (previous) item.setAttribute("tabindex", previous)
+        else item.removeAttribute("tabindex")
+      }
+    }
+
+    const paintPair = (index: number, on: boolean) => {
+      const note = notes[index]
+      if (!note) return
+      note.element.toggleAttribute("data-highlighted", on)
+      note.reference.toggleAttribute("data-highlighted", on)
+    }
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(layout)
+    }
+
+    const select = (index: number) => {
+      const previous = expanded
+      expanded = expanded === index ? -1 : index
+      if (previous >= 0) {
+        const note = notes[previous]
+        note.element.removeAttribute("data-expanded")
+        note.toggle.setAttribute("aria-expanded", "false")
+        note.reference.removeAttribute("data-pinned")
+        setInteractive(note, false)
+        paintPair(previous, false)
+      }
+      if (expanded >= 0) {
+        const note = notes[expanded]
+        note.element.setAttribute("data-expanded", "")
+        note.toggle.setAttribute("aria-expanded", "true")
+        note.reference.setAttribute("data-pinned", "")
+        setInteractive(note, true)
+        paintPair(expanded, true)
+      }
+      layer.toggleAttribute("data-has-expanded", expanded >= 0)
+      schedule()
+    }
+
+    const layout = () => {
+      frame = 0
+      if (!desktop.matches) return
+      const rail = layer.getBoundingClientRect()
+      const style = getComputedStyle(layer)
+      const previewHeight =
+        Number.parseFloat(
+          style.getPropertyValue("--sidenote-preview-height"),
+        ) || 72
+      const gap =
+        Number.parseFloat(style.getPropertyValue("--sidenote-gap")) || 8
+      const measurements = notes.map(({ reference, element }) => ({
+        anchorTop: reference.getBoundingClientRect().top - rail.top,
+        height: element.offsetHeight,
+      }))
+      const placements = placeSidenotes(measurements, {
+        railHeight: rail.height,
+        previewHeight,
+        gap,
+        expandedIndex: expanded,
+      })
+
+      for (let index = 0; index < notes.length; index++) {
+        const note = notes[index]
+        const placement = placements[index]
+        note.element.toggleAttribute("data-visible", placement.visible)
+        if (placement.top === null) continue
+        note.element.style.translate = `0 ${Math.round(placement.top)}px`
+        note.element.style.setProperty(
+          "--sidenote-clip",
+          `${Math.round(placement.clip)}px`,
+        )
+      }
+
+      if (expanded >= 0 && !placements[expanded]?.visible) select(expanded)
+    }
+
+    const applyMode = () => {
+      root.toggleAttribute("data-sidenotes", desktop.matches)
+      if (!desktop.matches && expanded >= 0) select(expanded)
+      schedule()
+    }
+
+    notes.forEach((note, index) => {
+      note.reference.addEventListener("click", (event) => {
+        if (!desktop.matches) return
+        event.preventDefault()
+        select(index)
+      })
+      note.toggle.addEventListener("click", () => select(index))
+      note.element.addEventListener("click", (event) => {
+        if (
+          (event.target as Element).closest(
+            "a, button, input, select, textarea",
+          )
+        )
+          return
+        if (getSelection()?.isCollapsed === false) return
+        select(index)
+      })
+      note.element.addEventListener("pointerenter", () =>
+        paintPair(index, true),
+      )
+      note.element.addEventListener("pointerleave", () => {
+        if (expanded !== index) paintPair(index, false)
+      })
+      note.reference.addEventListener("pointerenter", () =>
+        paintPair(index, true),
+      )
+      note.reference.addEventListener("pointerleave", () => {
+        if (expanded !== index) paintPair(index, false)
+      })
+    })
+
+    const resize = new ResizeObserver(schedule)
+    resize.observe(layer)
+    for (const note of notes) resize.observe(note.element)
+    layer.addEventListener("load", schedule, true)
+    addEventListener("scroll", schedule, { passive: true })
+    desktop.addEventListener("change", applyMode)
+    applyMode()
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setup, { once: true })
+  } else {
+    setup()
+  }
+</script>

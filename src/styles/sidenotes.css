@@ -1,0 +1,186 @@
+.sidenote-layer {
+  --sidenote-gap: 8px;
+  --sidenote-preview-height: 72px;
+
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media screen and (width >= 64rem) {
+  .sidenote-layer {
+    position: fixed;
+    inset-block: var(--page-offset-top) var(--page-offset-bottom);
+    inset-inline-end: var(--grid-edge);
+    z-index: 10;
+    display: block;
+    width: calc(3 * var(--grid-column-width) + 2 * var(--grid-gutter));
+    pointer-events: none;
+  }
+
+  .sidenote {
+    --sidenote-fill: var(--background);
+
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    display: grid;
+    grid-template-columns: 1.5em minmax(0, 1fr);
+    padding-block: var(--space-2xs);
+    color: var(--prose-foreground);
+    background: var(--sidenote-fill);
+    font-size: var(--step--1);
+    line-height: calc(var(--leading-offset) + 1em);
+    visibility: hidden;
+    clip-path: inset(-1lh -2rem var(--sidenote-clip, -1lh) -2rem);
+    transition:
+      color 0.18s ease,
+      opacity 0.18s ease;
+
+    &[data-visible] {
+      visibility: visible;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    &[data-highlighted] {
+      color: var(--foreground);
+    }
+
+    &[data-expanded] {
+      z-index: 2;
+      clip-path: inset(-1lh -2rem);
+      box-shadow: 0 0 0 0.5rem var(--sidenote-fill);
+    }
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      z-index: 1;
+      block-size: 1lh;
+      pointer-events: none;
+      background: linear-gradient(
+        to var(--fade-edge),
+        var(--sidenote-fill),
+        transparent
+      );
+    }
+
+    &::before {
+      --fade-edge: top;
+      inset-block-end: 100%;
+    }
+
+    &::after {
+      --fade-edge: bottom;
+      inset-block-start: calc(
+        100% - var(--sidenote-clip, 0px) - 1lh
+      );
+    }
+  }
+
+  .sidenote-layer[data-has-expanded]
+    .sidenote:not([data-expanded], [data-highlighted]) {
+    opacity: 0.42;
+  }
+
+  .sidenote-marker {
+    align-self: start;
+    padding: 0;
+    border: 0;
+    color: var(--muted-foreground);
+    background: transparent;
+    font: inherit;
+    font-size: 0.75em;
+    line-height: 1;
+    text-align: start;
+    cursor: pointer;
+    translate: 0 0.15em;
+
+    &:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  .sidenote-body {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+
+    :is(p, li) {
+      color: inherit;
+    }
+
+    > * {
+      max-inline-size: 100%;
+    }
+  }
+
+  .sidenote[data-expanded] .sidenote-body {
+    max-block-size: calc(
+      100svh - var(--page-offset-top) - var(--page-offset-bottom) -
+        2 * var(--space-2xs)
+    );
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sidenote {
+      transition:
+        translate 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        clip-path 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        color 0.18s ease,
+        opacity 0.18s ease;
+    }
+  }
+}
+
+:root[data-sidenotes] prose-content [data-footnote-ref] {
+  --underline: transparent;
+
+  margin-inline: -0.18em;
+  padding-inline: 0.18em;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+:root[data-sidenotes] prose-content [data-footnote-ref][data-highlighted] {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+:root[data-sidenotes] prose-content [data-footnote-ref][data-pinned] {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+:root[data-sidenotes] prose-content .footnotes {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

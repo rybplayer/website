@@ -1,4 +1,4 @@
-prose-content {
+:is(prose-content, :where(.sidenote-body)) {
   blockquote {
     border-inline-start: 2px solid var(--border);
     padding-inline-start: 1.25em;
@@ -76,12 +76,6 @@ prose-content {
     margin-block-end: 0.5em;
   }
 
-  .footnotes {
-    margin-block-start: var(--space-l);
-    padding-block-start: var(--space-s);
-    border-block-start: 1.5px solid var(--border);
-  }
-
   .expressive-code {
     --ec-codeBg: var(--site-block-code-background) !important;
     --ec-frm-edBg: var(--site-block-code-background) !important;
@@ -124,4 +118,10 @@ prose-content {
       margin-block: var(--space-3xs);
     }
   }
+}
+
+prose-content .footnotes {
+  margin-block-start: var(--space-l);
+  padding-block-start: var(--space-s);
+  border-block-start: 1.5px solid var(--border);
 }

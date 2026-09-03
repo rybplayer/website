@@ -48,7 +48,7 @@ a {
   }
 }
 
-prose-content {
+:is(prose-content, :where(.sidenote-body)) {
   display: block;
   font-size: var(--step-0);
   line-height: calc(var(--leading-offset) + 1em);
