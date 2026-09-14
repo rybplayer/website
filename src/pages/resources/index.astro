@@ -7,20 +7,14 @@ import { getResources } from "@/lib/content"
 const resources = await getResources()
 ---
 
-<Layout crumbs={[{ label: "Resources", href: "/resources" }]}>
+<Layout>
   <MetaPage slot="head" title="Resources" />
-  <h1>Resources</h1>
   <ul>
     {resources.map((resource) => <ResourceCard resource={resource} />)}
   </ul>
 </Layout>
 
 <style>
-  h1 {
-    font-size: var(--step-3);
-    font-weight: var(--font-weight-medium);
-    margin-block-end: var(--space-m);
-  }
   ul {
     display: flex;
     flex-direction: column;

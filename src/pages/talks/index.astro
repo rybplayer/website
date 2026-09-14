@@ -29,20 +29,14 @@ const talks = ((talksData as { items?: TalkData[] }).items ?? [])
   .sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf())
 ---
 
-<Layout crumbs={[{ label: "Talks", href: "/talks" }]}>
+<Layout>
   <MetaPage slot="head" title="Talks" />
-  <h1>Talks</h1>
   <ul>
     {talks.map((talk) => <TalkCard talk={talk} />)}
   </ul>
 </Layout>
 
 <style>
-  h1 {
-    font-size: var(--step-3);
-    font-weight: var(--font-weight-medium);
-    margin-block-end: var(--space-m);
-  }
   ul {
     display: flex;
     flex-direction: column;
