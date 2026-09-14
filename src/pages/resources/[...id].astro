@@ -48,7 +48,7 @@ const sections = rendered.map(({ entry, headings }, index) => ({
   label: entry.data.title,
   open: entry.id === resource.id,
   headings: headings.filter(
-    ({ depth, text }) => depth >= 2 && depth <= 4 && text.trim(),
+    ({ depth, text }) => depth >= 1 && depth <= 6 && text.trim(),
   ),
 }))
 const hasToc =

@@ -36,7 +36,7 @@ const { title, sections } = Astro.props
                 </summary>
                 <ul>
                   {headings.map(({ depth, slug, text }) => (
-                    <li data-depth={depth}>
+                    <li data-depth={depth} style={`--indent: ${depth - 1}`}>
                       <a href={`#${slug}`}>{text}</a>
                     </li>
                   ))}
@@ -48,7 +48,7 @@ const { title, sections } = Astro.props
           </li>
         ) : (
           headings.map(({ depth, slug, text }) => (
-            <li data-depth={depth}>
+            <li data-depth={depth} style={`--indent: ${depth - 1}`}>
               <a href={`#${slug}`}>{text}</a>
             </li>
           ))
@@ -263,14 +263,6 @@ const { title, sections } = Astro.props
         (var(--shift, 0) + var(--indent, 0)) *
         var(--space-xs)
       );
-    }
-
-    li[data-depth="3"] {
-      --indent: 1;
-    }
-
-    li[data-depth="4"] {
-      --indent: 2;
     }
   }
 </style>
