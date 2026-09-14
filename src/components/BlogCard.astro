@@ -9,22 +9,13 @@ type Props = { post: Post; entries?: Post[] }
 
 const { post, entries = [post] } = Astro.props
 const authors = await getEntries(post.data.authors)
-const cardImage = post.data.previewImage ?? post.data.image
-const lightCardImage = post.data.image
-const darkCardImage = post.data.previewImage
+const cardImage = post.data.image
 ---
 
 <li>
   {cardImage && (
       <a href={`/blog/${post.id}`} tabindex="-1" aria-hidden="true">
-        {lightCardImage && darkCardImage ? (
-          <>
-            <Image data-card-theme="light" src={lightCardImage} alt="" width={640} height={336} />
-            <Image data-card-theme="dark" src={darkCardImage} alt="" width={640} height={336} />
-          </>
-        ) : (
-          <Image src={cardImage} alt="" width={640} height={336} />
-        )}
+        <Image src={cardImage} alt="" width={640} height={336} />
       </a>
     )}
   <entry-info>
@@ -70,10 +61,6 @@ const darkCardImage = post.data.previewImage
       :global(img) {
         inline-size: 100%;
         block-size: auto;
-      }
-
-      [data-card-theme="dark"] {
-        display: none;
       }
     }
 
@@ -142,27 +129,5 @@ const darkCardImage = post.data.previewImage
         max-inline-size: 32rem;
       }
     }
-  }
-
-  @media (prefers-color-scheme: dark) {
-    [data-card-theme="light"] {
-      display: none;
-    }
-    [data-card-theme="dark"] {
-      display: block;
-    }
-  }
-
-  :global(:root[data-theme="light"]) [data-card-theme="light"] {
-    display: block;
-  }
-  :global(:root[data-theme="light"]) [data-card-theme="dark"] {
-    display: none;
-  }
-  :global(:root[data-theme="dark"]) [data-card-theme="light"] {
-    display: none;
-  }
-  :global(:root[data-theme="dark"]) [data-card-theme="dark"] {
-    display: block;
   }
 </style>
