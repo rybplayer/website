@@ -8,8 +8,9 @@ order: 3
 ---
 
 import CalloutShowcase from '@/components/CalloutShowcase.astro'
-import AbcNotation from '@/components/AbcNotation.astro'
+import LilyPondNotation from '@/components/LilyPondNotation.astro'
 import LogicPuzzle from '@/components/LogicGrid.astro'
+import felicidadeStavedTab from '../power-of-notation/felicidade-staved-tab.ly'
 
 ## How to use components
 
@@ -43,18 +44,14 @@ Callout color and icons are data driven, so it's easy to add a bunch of varietie
 
 ## Post-specific components
 
-Almost every post has a custom callout made just for it. For example, here's a music sheet component using [abcjs](https://www.abcjs.net/) with [tablature](https://en.wikipedia.org/wiki/Tablature) support:
+Almost every post has a custom callout made just for it. For example, here's a music sheet component using [LilyPond](https://lilypond.org/) with [tablature](https://en.wikipedia.org/wiki/Tablature) support:
 
-<AbcNotation
-  abc={`
-X:1
-M:C
-L:1/8
-.A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
-`}
+<LilyPondNotation
+  score={felicidadeStavedTab}
+  alt="A Felicidade excerpt with standard notation above guitar tablature"
 />
 
-Sidenote: [abcjs](https://www.abcjs.net/) can actually compile sheets to audio, have the user edit and play sheets, and much more. I've disabled most of these to keep things simple.
+LilyPond engraves the score during the site build, so the page ships a compact SVG rather than a browser-side music renderer.
 
 Here's a logic grid component for my post [Logic Grids as Data Structures](/blog/logic-grids-as-data-structures):
 

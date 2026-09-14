@@ -2,6 +2,7 @@ import { satteri } from "@astrojs/markdown-satteri"
 import mdx from "@astrojs/mdx"
 import sitemap from "@astrojs/sitemap"
 import { defineConfig } from "astro/config"
+import lilypond from "astro-lilypond"
 import { readdir, readFile } from "node:fs/promises"
 import { basename, extname, join, relative } from "node:path"
 import { calloutDirective } from "./src/lib/callout"
@@ -74,6 +75,7 @@ export default defineConfig({
     // Satteri emits trusted HTML for Temml, callout icons, and Expressive Code.
     // Astro's static MDX optimization preserves those subtrees via `set:html`.
     mdx({ processor: contentProcessor(), optimize: true }),
+    lilypond(),
     sitemap({
       filter: (page) =>
         !/\/(blog|resources)\/[^/]+\/[^/]+\/?$/.test(page) &&

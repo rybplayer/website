@@ -1,0 +1,47 @@
+---
+import { Score, type LilypondScore } from "astro-lilypond"
+
+type Props = {
+  score: LilypondScore
+  alt: string
+  maxWidthPx?: number
+}
+
+const { score, alt, maxWidthPx = 480 } = Astro.props
+---
+
+<div class="lilypond-wrapper" style={`--score-max:${maxWidthPx}px`}>
+  <Score content={score} crop alt={alt} class="lilypond-score" />
+</div>
+
+<style>
+  .lilypond-wrapper {
+    inline-size: fit-content;
+    max-inline-size: min(100%, var(--score-max));
+    margin-block: 0 1em;
+    margin-inline: auto;
+    overflow-x: auto;
+  }
+
+  .lilypond-wrapper :global(.lilypond-score) {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .lilypond-wrapper :global(.lilypond-score) {
+      filter: invert(1);
+    }
+  }
+
+  :global(:root[data-theme="dark"]) .lilypond-wrapper :global(.lilypond-score) {
+    filter: invert(1);
+  }
+
+  :global(:root[data-theme="light"])
+    .lilypond-wrapper
+    :global(.lilypond-score) {
+    filter: none;
+  }
+</style>
