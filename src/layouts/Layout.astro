@@ -196,3 +196,34 @@ const hasToc = Astro.slots.has("toc")
     }
   }
 </style>
+
+<script>
+  for (const spoiler of document.querySelectorAll<HTMLElement>(
+    ".spoiler:not([data-ready])",
+  )) {
+    spoiler.dataset.ready = ""
+    const toggle = () => {
+      const revealed = spoiler.toggleAttribute("data-revealed")
+      spoiler.setAttribute("aria-pressed", String(revealed))
+      spoiler.setAttribute(
+        "aria-label",
+        revealed ? "Hide spoiler" : "Reveal spoiler",
+      )
+    }
+    spoiler.addEventListener("click", () => {
+      const selection = getSelection()
+      if (
+        selection &&
+        !selection.isCollapsed &&
+        selection.containsNode(spoiler, true)
+      )
+        return
+      toggle()
+    })
+    spoiler.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return
+      event.preventDefault()
+      toggle()
+    })
+  }
+</script>

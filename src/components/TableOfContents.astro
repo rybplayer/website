@@ -14,17 +14,22 @@ const { title, sections } = Astro.props
 ---
 
 <nav aria-label="Table of contents" data-toc>
-  <label data-mobile-toggle data-bar>
-    <input type="checkbox" aria-label="Toggle table of contents">
+  <button
+    type="button"
+    aria-expanded="false"
+    aria-controls="mobile-table-of-contents"
+    data-mobile-toggle
+    data-bar
+  >
     <svg viewBox="0 0 16 16" aria-hidden="true">
       <circle cx="8" cy="8" r="6.5"></circle>
       <circle cx="8" cy="8" r="6.5" transform="rotate(-90 8 8)"></circle>
     </svg>
     <toc-current>{title}</toc-current>
     <ChevronIcon aria-hidden="true" />
-  </label>
+  </button>
 
-  <div data-mobile-panel data-bar>
+  <div id="mobile-table-of-contents" data-mobile-panel data-bar hidden>
     <ul>
       {sections.map(({ id, label, open, headings }) =>
           id ? (
@@ -97,16 +102,19 @@ const { title, sections } = Astro.props
     }
 
     [data-mobile-toggle] {
+      appearance: none;
+      inline-size: 100%;
+      margin: 0;
+      border-block-start: 0;
+      border-inline: 0;
+      border-radius: 0;
+      color: inherit;
+      font: inherit;
+      text-align: start;
       display: flex;
       align-items: center;
       gap: var(--space-2xs);
       cursor: pointer;
-
-      input {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-      }
 
       > svg:first-of-type {
         flex-shrink: 0;
@@ -148,12 +156,12 @@ const { title, sections } = Astro.props
       }
     }
 
-    nav:has(input:focus-visible) [data-mobile-toggle] {
+    [data-mobile-toggle]:focus-visible {
       outline: 2px solid var(--ring);
       outline-offset: -2px;
     }
 
-    nav:has(input:checked) [data-mobile-toggle] > svg:last-of-type {
+    [data-mobile-toggle][aria-expanded="true"] > svg:last-of-type {
       rotate: 180deg;
     }
 
@@ -172,7 +180,7 @@ const { title, sections } = Astro.props
       }
     }
 
-    nav:has(input:checked) [data-mobile-panel] {
+    [data-mobile-panel]:not([hidden]) {
       display: block;
     }
 
@@ -267,6 +275,9 @@ const { title, sections } = Astro.props
       --toc-rail-open-row: 1.75rem;
       --toc-rail-padding: var(--space-2xs);
       --toc-rail-overflow: 3rem;
+      --toc-rail-collapsed-width: calc(
+        var(--toc-rail-column) + 2 * var(--toc-rail-padding) + 4px
+      );
       --toc-rail-clip: calc(
         100% -
         var(--toc-rail-column) -
@@ -287,7 +298,7 @@ const { title, sections } = Astro.props
       translate: 0 -50%;
 
       > ul {
-        width: max-content;
+        width: var(--toc-rail-collapsed-width);
         max-width: inherit;
         max-height: inherit;
         padding: var(--toc-rail-padding);
@@ -386,6 +397,7 @@ const { title, sections } = Astro.props
       &:focus-within > ul {
         --toc-rail-clip: calc(-1 * var(--toc-rail-overflow));
 
+        width: max-content;
         border-color: var(--border);
         background: var(--background);
         box-shadow: 0 16px 32px color-mix(in oklab, black 20%, transparent);
@@ -421,13 +433,11 @@ const { title, sections } = Astro.props
   if (nav) {
     const mobile = matchMedia("(width < 64rem)")
     const ring = nav.querySelector<SVGElement>("[data-mobile-toggle] svg")
-    const mobileList = nav.querySelector<HTMLElement>(
-      "[data-mobile-panel] > ul",
-    )
+    const mobilePanel = nav.querySelector<HTMLElement>("[data-mobile-panel]")
     const rail = nav.querySelector<HTMLElement>("[data-toc-rail]")
     const railList = rail?.querySelector<HTMLElement>(":scope > ul")
     const currentLabel = nav.querySelector("toc-current")
-    const toggle = nav.querySelector<HTMLInputElement>("input")
+    const toggle = nav.querySelector<HTMLButtonElement>("[data-mobile-toggle]")
     const articles = document.querySelectorAll("main article")
 
     const progress = () => {
@@ -497,12 +507,18 @@ const { title, sections } = Astro.props
       })
     }
 
-    toggle?.addEventListener("change", () => {
-      if (toggle.checked) centerList(mobileList)
+    const setMobileOpen = (open: boolean) => {
+      if (!toggle || !mobilePanel) return
+      toggle.setAttribute("aria-expanded", String(open))
+      mobilePanel.hidden = !open
+      if (open) centerList(mobilePanel)
+    }
+
+    toggle?.addEventListener("click", () => {
+      setMobileOpen(toggle.getAttribute("aria-expanded") !== "true")
     })
-    mobileList?.addEventListener("click", (event) => {
-      if (toggle && (event.target as Element).closest("a"))
-        toggle.checked = false
+    mobilePanel?.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) setMobileOpen(false)
     })
 
     const visible = new Set<Element>()
@@ -539,7 +555,7 @@ const { title, sections } = Astro.props
           currentLabel.textContent =
             firstActive?.textContent?.trim() || fallback
         }
-        centerList(mobileList)
+        centerList(mobilePanel)
         centerList(railList)
       },
       { rootMargin: `-${scrollPadding}px 0px 0px` },
@@ -569,6 +585,7 @@ const { title, sections } = Astro.props
     addEventListener("scroll", progress, { passive: true })
     addEventListener("resize", updateRailEdge, { passive: true })
     mobile.addEventListener("change", () => {
+      if (!mobile.matches) setMobileOpen(false)
       progress()
       updateRailEdge()
     })

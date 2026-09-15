@@ -1,23 +1,112 @@
 ---
 title: 'A Review of Hercule Poirot'
-description: "hi"
+description: "Ranking all 33 novels, 55 short stories, and 6 continuation novels."
 date: 2026-09-02
 tags: ['literature']
-image: './poirot.webp'
+image: './poirot.svg'
 previewImage: './poirot-preview.webp'
 authors: ['ryan-batubara']
 ---
 
-# Dame Agatha Christia
+import TierList from '@/components/TierList.astro'
+import Spoiler from '@/components/Spoiler.astro'
 
-Agatha Christie was a devastatingly productive writer. In her 56 years as a published novelist, she wrote 72 novels,[^novels], 150+ short stories, and 16 plays, among others. Most of these works involve her Belgian detective, Hercule Poirot.
+import { novelTiers } from './novel-tiers'
+import { shortStoryTiers } from './short-story-tiers'
+import { sophieHannahTiers } from './sophie-hannah-tiers'
 
-This past year I set out to read all 33 novels, 55 short stories, and 
+# Dame Agatha Christie
 
-[^novels]: She wrote 66 detective novels and 6 more psychological novels under the pseudonym Mary Westmacott.
+[Agatha Christie](https://en.wikipedia.org/wiki/Agatha_Christie) was a devastatingly productive writer. In her 56 years as a published novelist, she wrote 72 novels,[^novels] 150+ short stories, and 16 plays. Most of these involve her Belgian detective, [Hercule Poirot](https://en.wikipedia.org/wiki/Hercule_Poirot).
+
+[^novels]: She wrote 66 detective novels and 6 more under the pseudonym Mary Westmacott.
+
+This past year I read all 33 novels and 55 short stories involving Hercule Poirot. I also read all 6 official Poirot continuation novels by [Sophie Hannah](https://en.wikipedia.org/wiki/Sophie_Hannah).
+
+I will rank the novels, short stories, and continuation novels independently in terms of three criteria:
+
+1. **Intrigue**: How interesting, memorable, or innovative is the plot and characters?
+2. **Credibility**: How realistic and acceptable is the solution? Does the reader feel like an idiot for not seeing the solution themselves?
+3. **Engagement**: Does the reader stay invested in the story? In other words, how is the pacing? Bonus points for witty dialogue, humor, and other elements of good writing.
+
+These criteria are obviously intertwined, so the final ranking will be given in tiers, where each tier is ranked in no particular order:
+
+1. **A Tier**: Masterworks of intrigue, credibility, and engagement. Must reads.
+2. **B Tier**: A solid work, perhaps lacking in one category.
+3. **C Tier**: Lacking in one or two categories. A decent work, but could be read later.
+4. **D Tier**: Often lacking in all three categories, these works should be read after the above.
+
+Due to the number of texts reviewed, I'll give detailed comments on only a few works. If you (dis)agree, feel free to send me an email and let's chat!
+
+:::warning[Spoiler warning]
+I try to keep the commentary below strictly spoiler-free. That said, I will assume a general familiarity with detective fiction and Hercule Poirot, so continue at your own risk.
+:::
+
+Also, note that I listened to most of these books in audiobook format. My favorite narrator is by far [Hugh Fraser](https://en.wikipedia.org/wiki/Hugh_Fraser). This also explains the choice of covers.
 
 # The Poirot Novels, Ranked
 
-1. Five Little Pigs. An absolute masterwork plot, _Five Little Pigs_ demonstrates Poirot's sophistication at its best. Five witnesses give written accounts of the same story, and 
+<TierList tiers={novelTiers} labelWidth="4.25rem" itemWidth="6rem" />
+
+**Five Little Pigs:** An absolute masterwork of plotting, _Five Little Pigs_ demonstrates Poirot's sophistication at its best. Five witnesses' written accounts are all Poirot has to solve a murder. Engaging, witty, and immensely satisfying, this is my favorite Poirot novel.
+
+**The Mysterious Affair at Styles:** My first Poirot novel, _The Mysterious Affair at Styles_, is criminally underrated. No novel captures Poirot's past and character quite like _The Mysterious Affair at Styles_. The French-language exchanges are my favorite parts.
+
+**The Murder on the Links:** My second Hercule Poirot novel, _The Murder on the Links_ is a fun parody of detective fiction tropes. The French detective Giraud, a "Sherlock Holmes"-style detective who draws all the wrong conclusions, is my personal favorite. Despite this, the novel is perhaps a bit too crowded with tropes for it to stand in A tier.
+
+**Curtain: Poirot's Last Case:** This is a very hard book to rate. I think the text has high intrigue but lacks engagement and credibility. I felt that readers were left in the dark for too long for the conclusion to be credible. I remained relatively engaged to the end, but this was mostly because of its status as the last Poirot novel. I see how Christie sought to end Poirot's story by incorporating many of the series' best themes and tropes, but it ultimately falls short of what I expect from Poirot.
+
+**Elephants Can Remember:** _Elephants Can Remember_ is my contender for the worst Poirot story of all time. Predictable, confusing, and flat, the story is full of long, repetitive conversations loosely tied together by Poirot and Ariadne Oliver. I think it would have worked better as a short story or novella with much of the conversation cut out.
+
+**The Big Four and Cat Among the Pigeons:** These two novels are what I would call Christie's failed attempts to incorporate grand international intrigue into Poirot. The plots feel like modern action thrillers rather than mysteries. They are not _bad_ action thrillers, but I was sorely disappointed in how Poirot handled these cases by and large.
+
+**The Clocks:** Despite its D ranking, I found _The Clocks_ an engaging read, primarily due to Poirot's reviews of detective fiction scattered throughout. That said, this is another case of Christie forcibly inserting grand international intrigue into Poirot, only for it to feel flat and superficial.
 
 # The Poirot Short Stories, Ranked
+
+<TierList tiers={shortStoryTiers} labelWidth="4.25rem" itemWidth="6rem" />
+
+Overall, I found myself valuing intrigue and enjoyment above credibility in these short stories. I think the short-story form lends itself well to exploring unusual, one-off ideas.
+
+**Wasps' Nest:** _Wasps' Nest_ is my favorite Hercule Poirot short story. Though I think it is far from the best Poirot short story from a literary perspective, I struggle to name a story that more succinctly captures Poirot's unique approach to his cases.
+
+**The Stymphalean Birds:** This is one of those short stories that scratches the same itch as the best [Sherlock Holmes stories](https://en.wikipedia.org/wiki/Sherlock_Holmes). It makes clever use of narration and imagery and leaves the reader feeling like an idiot for not seeing the truth.
+
+**The Adventure of the Western Star:** _The Adventure of the Western Star_ encapsulates the solid short stories that make up B tier. It is a fun read, with good twists, themes, and characters, but it is not exceptional.
+
+**The Adventure of Johnnie Waverly:** This story encapsulates what I see as a C tier short story. It is clever but somewhat predictable, with a stronger focus on padded drama and characterization than on a solid plot and reveal.
+
+**The Kidnapped Prime Minister:** _The Kidnapped Prime Minister_ is a contender for the worst Poirot short story. I think this is an example of Poirot's abilities being taken too far, with readers kept in the dark a little too long.
+
+**The Augean Stables:** Despite its D tier rating, I think _The Augean Stables_ is an interesting study of Poirot's character. The way he chooses to resolve the problem—particularly his decision about who will learn the truth—is most unusual and somewhat out of character.
+
+# Sophie Hannah’s Poirot Novels, Ranked
+
+<TierList tiers={sophieHannahTiers} labelWidth="4.25rem" itemWidth="6rem" />
+
+A major overarching problem with Sophie Hannah's Poirot novels is the reveal. Often, it falls flat because of an astounding lack of credibility, with characters who are too stereotypically evil or furtive. I did not find engagement to be as significant an issue, despite the novels' length compared with Christie's. I attribute much of this to her original narrator, Edward Catchpool.
+
+**The Monogram Murders:** My favorite of Hannah's Poirot novels, _The Monogram Murders_ features a truly bizarre crime with an equally bizarre solution. That said, I think Hannah captures Poirot's essence in this novel better than in her other books, and this kept me engaged.
+
+**The Mystery of Three Quarters:** _The Mystery of Three Quarters_ features a character and plot structure I have never seen in a mystery novel before. Unfortunately, this structure is the only thing the novel has going for it before it tapers off into an excessively long-winded conclusion.
+
+**Closed Casket:** _Closed Casket_ features Hannah's most acceptable unacceptable resolution. It is well written but lacks Christie's wit and humor.
+
+**Hercule Poirot's Silent Night:** This is unfortunately the worst text involving Poirot I have read. It features extremely baffling characters and plot points that had me looking up if I had misunderstood the plot. Namely, I'm referring to <Spoiler>Catchpool's mother poisoning Poirot</Spoiler>, <Spoiler>Mr. Hurt-His Head</Spoiler>, and <Spoiler>Vivienne Laurier's reaction to Nurse Bee Haskins</Spoiler>.
+
+# Conclusion
+
+I enjoyed my time with Christie's Poirot, though I did grow tired of him near the end as I finished many of the C and D tier texts I had skipped.
+
+One of the biggest challenges in rating detective fiction is that too much of a story's aftertaste depends on its ending. It is challenging to construct a text that is original, engaging, and logically sound. The plot cannot be merely plausible. It must be as watertight as the case it presents.
+
+For me, Hercule Poirot will always embody why detective fiction appeals to me. Poirot is a distinctly human detective. He is sharp, intelligent, and has all the qualities you would want from a genius detective. His arrogance, quirks, and often frank laziness balance his character, making him a human vessel brimming with as much intrigue as his cases.
+
+I think Christie's greatest success with Poirot was her ability to make his sleuthing take center stage. Her earlier works, most notably _The Mysterious Affair at Styles_, have a clear Holmesian feel. There, Hastings—as Watson—exists to support the sleuth Poirot—as Holmes. This structure works for Holmes as a balancing act between Watson's extreme humanity and Holmes's inhumanity. I think Christie realized that Poirot did not need such a crutch. Many of her best Poirot works feature Poirot standing alone, and it works wonders.
+
+Overall, I thoroughly enjoyed my experience with Hercule Poirot, and look forward to reading more of Christie's works. If you are interested in detective fiction, I also recommend the following series:
+
+1. [Sherlock Holmes](https://en.wikipedia.org/wiki/Sherlock_Holmes), by [Arthur Conan Doyle](https://en.wikipedia.org/wiki/Arthur_Conan_Doyle).
+2. [Susan Ryeland](https://www.goodreads.com/series/278932-susan-ryeland), by [Anthony Horowitz](https://en.wikipedia.org/wiki/Anthony_Horowitz).
+3. [Lord Peter Wimsey](https://en.wikipedia.org/wiki/Lord_Peter_Wimsey), by [Dorothy Sayers](https://en.wikipedia.org/wiki/Dorothy_Sayers).
+4. [Miss Marple](https://en.wikipedia.org/wiki/Miss_Marple), by [Agatha Christie](https://en.wikipedia.org/wiki/Agatha_Christie).

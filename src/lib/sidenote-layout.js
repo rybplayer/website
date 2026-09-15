@@ -4,9 +4,9 @@
  */
 
 /**
- * Places margin notes near their references while reserving a readable preview
- * for collisions. The selected note receives its full measured height and
- * displaces the notes below it.
+ * Places margin notes near their references at full height whenever the active
+ * notes fit in the rail. Only overfull groups use readable collision previews;
+ * the selected note receives its full measured height and displaces notes below.
  *
  * @param {readonly SidenoteMeasurement[]} notes
  * @param {{ railHeight: number, previewHeight: number, gap: number, expandedIndex?: number }} options
@@ -24,6 +24,51 @@ export function placeSidenotes(notes, options) {
     .filter(
       ({ anchorTop }) => anchorTop > -previewHeight && anchorTop < railHeight,
     )
+
+  const fullHeight = active.reduce((total, note) => total + note.height, 0)
+  const fullLayoutFits =
+    fullHeight + Math.max(0, active.length - 1) * gap <= railHeight
+
+  if (fullLayoutFits && expandedIndex < 0) {
+    let cursor = 0
+    for (const note of active) {
+      const top = Math.max(note.anchorTop, cursor)
+      placements[note.index].top = top
+      cursor = top + note.height + gap
+    }
+
+    const last = active.at(-1)
+    if (last) {
+      const lastPlacement = placements[last.index]
+      lastPlacement.top = Math.min(
+        lastPlacement.top ?? last.anchorTop,
+        railHeight - last.height,
+      )
+
+      for (let position = active.length - 2; position >= 0; position--) {
+        const note = active[position]
+        const next = active[position + 1]
+        const nextTop = placements[next.index].top ?? next.anchorTop
+        placements[note.index].top = Math.min(
+          placements[note.index].top ?? note.anchorTop,
+          nextTop - gap - note.height,
+        )
+      }
+
+      const firstTop = placements[active[0].index].top ?? 0
+      if (firstTop < 0) {
+        for (const note of active) {
+          const placement = placements[note.index]
+          if (placement.top !== null) placement.top -= firstTop
+        }
+      }
+    }
+
+    for (const note of active) {
+      placements[note.index].visible = true
+    }
+    return placements
+  }
 
   let cursor = -previewHeight
   for (const note of active) {

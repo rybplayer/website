@@ -134,6 +134,19 @@
     const desktop = matchMedia("(width >= 64rem)")
     let expanded = -1
     let frame = 0
+    let animationTimer = 0
+
+    const settle = () => {
+      layer.removeAttribute("data-animating")
+      clearTimeout(animationTimer)
+      animationTimer = 0
+    }
+
+    const animate = () => {
+      settle()
+      layer.setAttribute("data-animating", "")
+      animationTimer = window.setTimeout(settle, 320)
+    }
 
     const setInteractive = (note: Note, enabled: boolean) => {
       for (const item of note.focusables) {
@@ -178,6 +191,7 @@
         paintPair(expanded, true)
       }
       layer.toggleAttribute("data-has-expanded", expanded >= 0)
+      animate()
       schedule()
     }
 
@@ -207,6 +221,7 @@
         const note = notes[index]
         const placement = placements[index]
         note.element.toggleAttribute("data-visible", placement.visible)
+        note.element.toggleAttribute("data-clipped", placement.clip > 0.5)
         if (placement.top === null) continue
         note.element.style.translate = `0 ${Math.round(placement.top)}px`
         note.element.style.setProperty(
@@ -259,7 +274,14 @@
     resize.observe(layer)
     for (const note of notes) resize.observe(note.element)
     layer.addEventListener("load", schedule, true)
-    addEventListener("scroll", schedule, { passive: true })
+    addEventListener(
+      "scroll",
+      () => {
+        settle()
+        schedule()
+      },
+      { passive: true },
+    )
     desktop.addEventListener("change", applyMode)
     applyMode()
   }
