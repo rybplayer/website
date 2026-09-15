@@ -12,12 +12,11 @@ export const SITE = {
   dir: "ltr",
   defaultPageImage: "/static/1200x630.webp",
   defaultPostImage: "/static/1200x630.webp",
-  featuredPostCount: 1,
-  featuredProjectCount: 1,
 } as const
 
 export const NAVIGATION = [
   { href: "/blog", label: "Blog" },
+  { href: "/publications", label: "Publications" },
   { href: "/projects", label: "Projects" },
   { href: "/talks", label: "Talks" },
   { href: "/resources", label: "Resources" },

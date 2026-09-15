@@ -1,0 +1,167 @@
+---
+import { assertLinkIconAsset, linkIconForUrl } from "@/lib/link-icons"
+import { formatDate, formatMonthYear } from "@/lib/utils"
+import type {
+  Publication,
+  PublicationLink,
+  PublicationLinkKind,
+} from "@/data/publications"
+
+type Props = { publication: Publication }
+
+const { publication } = Astro.props
+const linkOrder: PublicationLinkKind[] = [
+  "conference",
+  "paper",
+  "preprint",
+  "code",
+  "slides",
+]
+const links = publication.links.toSorted(
+  (a, b) => linkOrder.indexOf(a.kind) - linkOrder.indexOf(b.kind),
+)
+const primaryHref =
+  links.find(({ kind, href }) => kind === "paper" && href)?.href ??
+  links.find(({ kind, href }) => kind === "preprint" && href)?.href
+
+const linkLabel = ({ kind, label }: PublicationLink) =>
+  label ?? kind.charAt(0).toUpperCase() + kind.slice(1)
+const dateLabel =
+  publication.datePrecision === "year"
+    ? String(publication.date.getUTCFullYear())
+    : publication.datePrecision === "month"
+      ? formatMonthYear(publication.date)
+      : formatDate(publication.date)
+const iconStyle = (href: string) =>
+  `--publication-icon:url("${assertLinkIconAsset(linkIconForUrl(href))}")`
+---
+
+<li>
+  <article>
+    <h2>
+      {primaryHref ? (
+        <a href={primaryHref} target="_blank" rel="noopener noreferrer">
+          {publication.title}
+        </a>
+      ) : (
+        publication.title
+      )}
+    </h2>
+    <publication-meta>
+      <time datetime={publication.date.toISOString()}>
+        {dateLabel}
+      </time>
+      <span aria-hidden="true">·</span>
+      <publication-authors>
+        {publication.authors.map((author, index) => (
+          <>
+            {index > 0 && ", "}
+            {author === "Ryan Batubara" ? <strong>{author}</strong> : author}
+          </>
+        ))}
+      </publication-authors>
+    </publication-meta>
+    <p>{publication.description}</p>
+    <publication-links aria-label={`Links for ${publication.title}`}>
+      {links.map((link) =>
+        link.href ? (
+          <a
+            class:list={{ conference: link.kind === "conference" }}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span
+              class="publication-icon"
+              style={iconStyle(link.href)}
+              aria-hidden="true"
+            />
+            {linkLabel(link)}
+          </a>
+        ) : (
+          <span class:list={{ conference: link.kind === "conference" }}>
+            <span class="status-icon" aria-hidden="true" />
+            {linkLabel(link)}
+          </span>
+        ),
+      )}
+    </publication-links>
+  </article>
+</li>
+
+<style>
+  article {
+    display: flex;
+    flex-direction: column;
+  }
+
+  h2 {
+    font-size: var(--step-1);
+    font-weight: var(--font-weight-medium);
+    line-height: calc(var(--leading-offset) + 1em);
+  }
+
+  publication-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3xs);
+    margin-block-end: var(--space-3xs);
+    color: var(--muted-foreground);
+    font-size: var(--font-size-subtext);
+  }
+
+  publication-authors strong {
+    color: var(--foreground);
+    font-weight: var(--font-weight-medium);
+  }
+
+  p {
+    color: var(--muted-foreground);
+  }
+
+  publication-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-2xs);
+    font-size: var(--font-size-subtext);
+  }
+
+  publication-links > :is(a, span) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding-inline: var(--space-2xs);
+    color: var(--accent-foreground);
+    background-color: var(--accent);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+  }
+
+  publication-links > a:hover {
+    color: var(--foreground);
+  }
+
+  publication-links > .conference {
+    color: var(--tag-foreground);
+    background-color: var(--tag-background);
+  }
+
+  .publication-icon {
+    inline-size: 0.75em;
+    block-size: 0.75em;
+    flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask: var(--publication-icon) center / contain no-repeat;
+    mask: var(--publication-icon) center / contain no-repeat;
+  }
+
+  .status-icon {
+    inline-size: 0.45em;
+    block-size: 0.45em;
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+    background-color: currentColor;
+  }
+</style>

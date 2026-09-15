@@ -1,0 +1,31 @@
+---
+import MetaPage from "@/components/MetaPage.astro"
+import PublicationCard from "@/components/PublicationCard.astro"
+import Layout from "@/layouts/Layout.astro"
+import { publications } from "@/data/publications"
+
+const sortedPublications = publications.toSorted(
+  (a, b) => b.date.getTime() - a.date.getTime(),
+)
+---
+
+<Layout crumbs={[{ label: "Publications", href: "/publications" }]}>
+  <MetaPage
+    slot="head"
+    title="Publications"
+    description="Research publications by Ryan Batubara."
+  />
+  <ul>
+    {sortedPublications.map((publication) => (
+      <PublicationCard publication={publication} />
+    ))}
+  </ul>
+</Layout>
+
+<style>
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+</style>

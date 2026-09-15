@@ -1,15 +1,18 @@
 ---
 import BlogCard from "@/components/BlogCard.astro"
 import MetaPage from "@/components/MetaPage.astro"
-import ProjectCard from "@/components/ProjectCard.astro"
+import PublicationCard from "@/components/PublicationCard.astro"
 import SocialIcons from "@/components/SocialIcons.astro"
-import { SITE, SOCIALS } from "@/consts"
+import { SOCIALS } from "@/consts"
+import { publications } from "@/data/publications"
 import Layout from "@/layouts/Layout.astro"
-import { getPosts, getProjects, getSubposts } from "@/lib/content"
+import { getPosts, getSubposts } from "@/lib/content"
 
-const posts = (await getPosts()).slice(0, SITE.featuredPostCount)
+const featuredPost = (await getPosts()).find(
+  ({ id }) => id === "functional-python",
+)
+const featuredPublication = publications.find(({ featured }) => featured)
 const series = await getSubposts()
-const projects = (await getProjects()).slice(0, SITE.featuredProjectCount)
 ---
 
 <Layout>
@@ -30,12 +33,14 @@ const projects = (await getProjects()).slice(0, SITE.featuredProjectCount)
       <p>
         I'm a
         <a href="https://cse.ucsd.edu/graduate/degree-programs/ms-program">
-        Computer Science</a>
+          Computer Science</a
+        >
         Master's student at <a href="https://ucsd.edu/">UCSD</a>. I also
         completed by Bachelor's in
         <a
           href="https://math.ucsd.edu/students/undergraduate/ma30-math-computer-science-b-s/"
-        >Math-CS</a>
+          >Math-CS</a
+        >
         and
         <a href="https://datascience.ucsd.edu/">Data Science</a>
         at UCSD. I'm applying to PhD programs in Computer Science, specifically
@@ -70,29 +75,32 @@ const projects = (await getProjects()).slice(0, SITE.featuredProjectCount)
     </intro-copy>
   </section>
 
-  {projects.length > 0 && (
-    <section class="listing" aria-labelledby="projects-title">
+  {featuredPublication && (
+    <section class="listing" aria-labelledby="publication-title">
       <listing-heading>
-        <h2 id="projects-title">Latest project</h2>
-        <a href="/projects">See all projects →</a>
+        <h2 id="publication-title">Featured paper</h2>
+        <a href="/publications">See all publications →</a>
       </listing-heading>
-      <ul>{projects.map((project) => <ProjectCard project={project} />)}</ul>
+      <ul>
+        <PublicationCard publication={featuredPublication} />
+      </ul>
     </section>
   )}
 
-  {posts.length > 0 && (
+  {featuredPost && (
     <section class="listing" aria-labelledby="posts-title">
       <listing-heading>
-        <h2 id="posts-title">Latest blog post</h2>
+        <h2 id="posts-title">Featured blog post</h2>
         <a href="/blog">See all posts →</a>
       </listing-heading>
       <ul>
-        {posts.map((post) => (
-          <BlogCard
-            post={post}
-            entries={[post, ...(series.get(post.id) ?? [])]}
-          />
-        ))}
+        <BlogCard
+          post={featuredPost}
+          entries={[
+            featuredPost,
+            ...(series.get(featuredPost.id) ?? []),
+          ]}
+        />
       </ul>
     </section>
   )}
@@ -168,7 +176,7 @@ const projects = (await getProjects()).slice(0, SITE.featuredProjectCount)
   }
 
   .listing {
-    margin-block-start: var(--space-xl);
+    margin-block-start: var(--space-l);
   }
 
   listing-heading {
