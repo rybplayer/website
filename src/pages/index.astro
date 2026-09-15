@@ -4,14 +4,14 @@ import MetaPage from "@/components/MetaPage.astro"
 import PublicationCard from "@/components/PublicationCard.astro"
 import SocialIcons from "@/components/SocialIcons.astro"
 import { SOCIALS } from "@/consts"
-import { publications } from "@/data/publications"
 import Layout from "@/layouts/Layout.astro"
-import { getPosts, getSubposts } from "@/lib/content"
+import { getPosts, getPublications, getSubposts } from "@/lib/content"
 
 const featuredPost = (await getPosts()).find(
   ({ id }) => id === "functional-python",
 )
-const featuredPublication = publications.find(({ featured }) => featured)
+const publications = await getPublications()
+const featuredPublication = publications.find(({ data }) => data.featured)
 const series = await getSubposts()
 ---
 

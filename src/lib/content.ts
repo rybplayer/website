@@ -78,6 +78,13 @@ export async function getProjects() {
   )
 }
 
+export async function getPublications() {
+  const publications = await getCollection("publications")
+  return publications.sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+  )
+}
+
 const PROSE_WORDS_PER_MINUTE = 265
 const CODE_SECONDS_PER_LINE = 1
 const MAX_CODE_SECONDS_PER_BLOCK = 30

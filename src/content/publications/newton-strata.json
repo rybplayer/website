@@ -1,0 +1,34 @@
+{
+  "title": "Newton strata realization for hypersurfaces via explicit p-adic cohomology",
+  "authors": [
+    "Ryan Batubara",
+    "Jack J. Garzella",
+    "Yongyuan Huang",
+    "Maximus Mellberg"
+  ],
+  "date": "2026-02-27",
+  "description": "Algorithms and GPU-accelerated software for computing zeta functions and Newton polygons of projective hypersurfaces over finite fields, together with new examples of varieties with specified Newton polygons.",
+  "links": [
+    {
+      "kind": "conference",
+      "label": "ANTS XVII",
+      "href": "https://antsmath.org/ANTSXVII/papers.html#batubara_garzella_huang_mellberg"
+    },
+    {
+      "kind": "paper",
+      "href": "https://antsmath.org/ANTSXVII/papers/antsxvii-batubara_garzella_huang_mellberg-paper.pdf"
+    },
+    {
+      "kind": "preprint",
+      "href": "https://arxiv.org/abs/2602.24155"
+    },
+    {
+      "kind": "code",
+      "href": "https://github.com/UCSD-computational-number-theory/DeRham.jl"
+    },
+    {
+      "kind": "slides",
+      "href": "https://antsmath.org/ANTSXVII/slides/antsxvii-batubara_garzella_huang_mellberg-slides.pdf"
+    }
+  ]
+}

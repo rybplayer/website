@@ -1,15 +1,15 @@
 ---
 import { assertLinkIconAsset, linkIconForUrl } from "@/lib/link-icons"
 import { formatDate, formatMonthYear } from "@/lib/utils"
-import type {
-  Publication,
-  PublicationLink,
-  PublicationLinkKind,
-} from "@/data/publications"
+import type { CollectionEntry } from "astro:content"
 
+type Publication = CollectionEntry<"publications">
+type PublicationLink = Publication["data"]["links"][number]
+type PublicationLinkKind = PublicationLink["kind"]
 type Props = { publication: Publication }
 
 const { publication } = Astro.props
+const data = publication.data
 const linkOrder: PublicationLinkKind[] = [
   "conference",
   "paper",
@@ -17,7 +17,7 @@ const linkOrder: PublicationLinkKind[] = [
   "code",
   "slides",
 ]
-const links = publication.links.toSorted(
+const links = data.links.toSorted(
   (a, b) => linkOrder.indexOf(a.kind) - linkOrder.indexOf(b.kind),
 )
 const primaryHref =
@@ -27,11 +27,11 @@ const primaryHref =
 const linkLabel = ({ kind, label }: PublicationLink) =>
   label ?? kind.charAt(0).toUpperCase() + kind.slice(1)
 const dateLabel =
-  publication.datePrecision === "year"
-    ? String(publication.date.getUTCFullYear())
-    : publication.datePrecision === "month"
-      ? formatMonthYear(publication.date)
-      : formatDate(publication.date)
+  data.datePrecision === "year"
+    ? String(data.date.getUTCFullYear())
+    : data.datePrecision === "month"
+      ? formatMonthYear(data.date)
+      : formatDate(data.date)
 const iconStyle = (href: string) =>
   `--publication-icon:url("${assertLinkIconAsset(linkIconForUrl(href))}")`
 ---
@@ -41,19 +41,19 @@ const iconStyle = (href: string) =>
     <h2>
       {primaryHref ? (
         <a href={primaryHref} target="_blank" rel="noopener noreferrer">
-          {publication.title}
+          {data.title}
         </a>
       ) : (
-        publication.title
+        data.title
       )}
     </h2>
     <publication-meta>
-      <time datetime={publication.date.toISOString()}>
+      <time datetime={data.date.toISOString()}>
         {dateLabel}
       </time>
       <span aria-hidden="true">·</span>
       <publication-authors>
-        {publication.authors.map((author, index) => (
+        {data.authors.map((author, index) => (
           <>
             {index > 0 && ", "}
             {author === "Ryan Batubara" ? <strong>{author}</strong> : author}
@@ -61,8 +61,8 @@ const iconStyle = (href: string) =>
         ))}
       </publication-authors>
     </publication-meta>
-    <p>{publication.description}</p>
-    <publication-links aria-label={`Links for ${publication.title}`}>
+    <p>{data.description}</p>
+    <publication-links aria-label={`Links for ${data.title}`}>
       {links.map((link) =>
         link.href ? (
           <a

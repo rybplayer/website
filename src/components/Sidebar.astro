@@ -109,12 +109,16 @@ const section = NAVIGATION.find(
       text-decoration-line: none;
 
       svg {
-        inline-size: 1.125rem;
-        block-size: 1.125rem;
+        inline-size: auto;
+        block-size: 1.5rem;
         flex-shrink: 0;
       }
 
-      @media (width < 26rem) {
+      span {
+        white-space: nowrap;
+      }
+
+      @media (width < 40rem) {
         span {
           display: none;
         }

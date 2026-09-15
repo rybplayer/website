@@ -37,7 +37,7 @@ const cardImage = post.data.image
       {post.data.tags && (
           <entry-tags>
             {post.data.tags.map((tag) => (
-              <span>#{tag}</span>
+              <a href={`/tags/${tag}`}>#{tag}</a>
             ))}
           </entry-tags>
         )}
@@ -98,16 +98,22 @@ const cardImage = post.data.image
         }
 
         entry-tags {
+          --underline: transparent;
+
           display: flex;
           flex-wrap: wrap;
           gap: var(--space-3xs);
 
-          span {
+          a {
             color: color-mix(
               in oklab,
               var(--muted-foreground) 50%,
               transparent
             );
+
+            &:hover {
+              color: var(--foreground);
+            }
           }
         }
 

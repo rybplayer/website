@@ -2,11 +2,9 @@
 import MetaPage from "@/components/MetaPage.astro"
 import PublicationCard from "@/components/PublicationCard.astro"
 import Layout from "@/layouts/Layout.astro"
-import { publications } from "@/data/publications"
+import { getPublications } from "@/lib/content"
 
-const sortedPublications = publications.toSorted(
-  (a, b) => b.date.getTime() - a.date.getTime(),
-)
+const publications = await getPublications()
 ---
 
 <Layout crumbs={[{ label: "Publications", href: "/publications" }]}>
@@ -16,7 +14,7 @@ const sortedPublications = publications.toSorted(
     description="Research publications by Ryan Batubara."
   />
   <ul>
-    {sortedPublications.map((publication) => (
+    {publications.map((publication) => (
       <PublicationCard publication={publication} />
     ))}
   </ul>

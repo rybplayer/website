@@ -74,4 +74,32 @@ const projects = defineCollection({
     }),
 })
 
-export const collections = { authors, blog, projects, resources }
+const publications = defineCollection({
+  loader: glob({
+    pattern: "**/[^_]*.json",
+    base: "./src/content/publications",
+  }),
+  schema: z.object({
+    title: z.string(),
+    authors: z.array(z.string()),
+    date: z.coerce.date(),
+    datePrecision: z.enum(["day", "month", "year"]).optional(),
+    description: z.string(),
+    featured: z.boolean().optional(),
+    links: z.array(
+      z.object({
+        kind: z.enum(["conference", "paper", "preprint", "code", "slides"]),
+        href: z.url().optional(),
+        label: z.string().optional(),
+      }),
+    ),
+  }),
+})
+
+export const collections = {
+  authors,
+  blog,
+  projects,
+  publications,
+  resources,
+}
