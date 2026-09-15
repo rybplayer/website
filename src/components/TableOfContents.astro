@@ -13,105 +13,108 @@ type Props = { title: string; sections: Section[] }
 const { title, sections } = Astro.props
 ---
 
-<nav aria-label="Table of contents">
-  <toc-title aria-hidden="true"><span>{title}</span></toc-title>
-  <label data-bar>
-    <input type="checkbox" aria-label="Toggle table of contents">
+<nav aria-label="Table of contents" data-toc>
+  <button
+    type="button"
+    aria-expanded="false"
+    aria-controls="mobile-table-of-contents"
+    data-mobile-toggle
+    data-bar
+  >
     <svg viewBox="0 0 16 16" aria-hidden="true">
-      <circle cx="8" cy="8" r="6.5" />
-      <circle cx="8" cy="8" r="6.5" transform="rotate(-90 8 8)" />
+      <circle cx="8" cy="8" r="6.5"></circle>
+      <circle cx="8" cy="8" r="6.5" transform="rotate(-90 8 8)"></circle>
     </svg>
     <toc-current>{title}</toc-current>
     <ChevronIcon aria-hidden="true" />
-  </label>
-  <ul data-bar>
-    {sections.map(({ id, label, open, headings }) =>
-        id ? (
-          <li data-group>
-            {headings.length > 0 ? (
-              <details open={open || undefined}>
-                <summary>
-                  <a href={`#${id}`}>{label}</a>
-                  <ChevronIcon aria-hidden="true" />
-                </summary>
-                <ul>
-                  {headings.map(({ depth, slug, text }) => (
-                    <li data-depth={depth} style={`--indent: ${depth - 1}`}>
-                      <a href={`#${slug}`}>{text}</a>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            ) : (
-              <a href={`#${id}`}>{label}</a>
-            )}
-          </li>
-        ) : (
-          headings.map(({ depth, slug, text }) => (
-            <li data-depth={depth} style={`--indent: ${depth - 1}`}>
-              <a href={`#${slug}`}>{text}</a>
+  </button>
+
+  <div id="mobile-table-of-contents" data-mobile-panel data-bar hidden>
+    <ul>
+      {sections.map(({ id, label, open, headings }) =>
+          id ? (
+            <li data-group>
+              {headings.length > 0 ? (
+                <details open={open || undefined}>
+                  <summary>
+                    <a href={`#${id}`}>{label}</a>
+                    <ChevronIcon aria-hidden="true" />
+                  </summary>
+                  <ul>
+                    {headings.map(({ depth, slug, text }) => (
+                      <li data-depth={depth}>
+                        <a href={`#${slug}`}>{text}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : (
+                <a href={`#${id}`}>{label}</a>
+              )}
             </li>
-          ))
-        ),
-      )}
-  </ul>
+          ) : (
+            headings.map(({ depth, slug, text }) => (
+              <li data-depth={depth}>
+                <a href={`#${slug}`}>{text}</a>
+              </li>
+            ))
+          ),
+        )}
+    </ul>
+  </div>
+
+  <div data-toc-rail>
+    <ul>
+      {sections.map(({ id, label, headings }) => (
+          <>
+            {id && (
+              <li data-depth="1">
+                <a href={`#${id}`}><span data-toc-label>{label}</span></a>
+              </li>
+            )}
+            {headings.map(({ depth, slug, text }) => (
+              <li
+                data-depth={depth}
+                data-indent={Math.max(0, depth - 2 + (id ? 1 : 0))}
+              >
+                <a href={`#${slug}`}><span data-toc-label>{text}</span></a>
+              </li>
+            ))}
+          </>
+        ))}
+    </ul>
+  </div>
 </nav>
 
 <style>
   nav {
-    position: sticky;
-    top: var(--page-offset-top);
-    display: flex;
-    flex-direction: column;
-    max-height: calc(
-      100svh -
-      var(--page-offset-top) -
-      var(--page-offset-bottom)
-    );
     font-size: var(--step--1);
-
-    @media (width < 64rem) {
-      position: relative;
-      top: auto;
-      max-height: none;
-    }
   }
 
-  toc-title {
-    display: grid;
-    grid-template-rows: 0fr;
-    flex-shrink: 0;
-    font-weight: var(--font-weight-medium);
-
-    > span {
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    &[data-visible] {
-      grid-template-rows: 1fr;
-      margin-block-end: var(--space-2xs);
-    }
-
-    @media (width < 64rem) {
-      display: none;
-    }
-  }
-
-  label {
+  [data-mobile-toggle],
+  [data-mobile-panel] {
     display: none;
+  }
 
-    @media (width < 64rem) {
+  @media (width < 64rem) {
+    nav {
+      position: relative;
+    }
+
+    [data-mobile-toggle] {
+      appearance: none;
+      inline-size: 100%;
+      margin: 0;
+      border-block-start: 0;
+      border-inline: 0;
+      border-radius: 0;
+      color: inherit;
+      font: inherit;
+      text-align: start;
       display: flex;
       align-items: center;
       gap: var(--space-2xs);
       cursor: pointer;
-
-      input {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-      }
 
       > svg:first-of-type {
         flex-shrink: 0;
@@ -140,9 +143,9 @@ const { title, sections } = Astro.props
         flex: 1;
         min-width: 0;
         overflow: hidden;
+        color: var(--muted-foreground);
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: var(--muted-foreground);
       }
 
       > svg:last-of-type {
@@ -152,51 +155,40 @@ const { title, sections } = Astro.props
         color: var(--muted-foreground);
       }
     }
-  }
 
-  nav:has(input:focus-visible) label {
-    @media (width < 64rem) {
+    [data-mobile-toggle]:focus-visible {
       outline: 2px solid var(--ring);
       outline-offset: -2px;
     }
-  }
 
-  nav:has(input:checked) label > svg:last-of-type {
-    @media (width < 64rem) {
+    [data-mobile-toggle][aria-expanded="true"] > svg:last-of-type {
       rotate: 180deg;
     }
-  }
 
-  nav > ul {
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    @media (width < 64rem) {
-      display: none;
+    [data-mobile-panel] {
       position: absolute;
       inset-block-start: 100%;
       inset-inline: 0;
       max-block-size: 30svh;
-    }
-  }
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
 
-  nav:has(input:checked) > ul {
-    @media (width < 64rem) {
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    [data-mobile-panel]:not([hidden]) {
+      display: block;
+    }
+
+    ul {
       display: flex;
+      flex-direction: column;
+      gap: var(--space-3xs);
     }
-  }
-
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3xs);
 
     a {
       color: var(--muted-foreground);
@@ -231,14 +223,10 @@ const { title, sections } = Astro.props
 
         svg {
           flex-shrink: 0;
-          margin-inline-start: auto;
           inline-size: 1em;
           block-size: 1em;
+          margin-inline-start: auto;
           color: var(--muted-foreground);
-        }
-
-        &:hover svg {
-          color: var(--foreground);
         }
       }
 
@@ -252,10 +240,6 @@ const { title, sections } = Astro.props
         margin-block-start: var(--space-3xs);
         font-weight: var(--font-weight-normal);
       }
-
-      details:not([open]):has(a[data-active]) summary a {
-        color: var(--foreground);
-      }
     }
 
     li[data-depth] {
@@ -264,166 +248,348 @@ const { title, sections } = Astro.props
         var(--space-xs)
       );
     }
+
+    li[data-depth="3"] {
+      --indent: 1;
+    }
+
+    li[data-depth="4"] {
+      --indent: 2;
+    }
+  }
+
+  @property --toc-rail-clip {
+    syntax: "<length-percentage>";
+    inherits: false;
+    initial-value: 0px;
+  }
+
+  [data-toc-rail] {
+    display: none;
+  }
+
+  @media screen and (width >= 64rem) {
+    [data-toc-rail] {
+      --toc-rail-column: 1.25rem;
+      --toc-rail-row: 0.6875rem;
+      --toc-rail-open-row: 1.75rem;
+      --toc-rail-padding: var(--space-2xs);
+      --toc-rail-overflow: 3rem;
+      --toc-rail-collapsed-width: calc(
+        var(--toc-rail-column) + 2 * var(--toc-rail-padding) + 4px
+      );
+      --toc-rail-clip: calc(
+        100% -
+        var(--toc-rail-column) -
+        2 *
+        var(--toc-rail-padding) -
+        4px
+      );
+
+      position: fixed;
+      inset-block-start: 50%;
+      inset-inline-start: calc(var(--grid-edge) - var(--toc-rail-padding));
+      z-index: 20;
+      display: block;
+      width: max-content;
+      max-width: min(28rem, calc(100vw - 1.5rem));
+      max-height: calc(100svh - 2 * var(--page-offset-top));
+      pointer-events: none;
+      translate: 0 -50%;
+
+      > ul {
+        width: var(--toc-rail-collapsed-width);
+        max-width: inherit;
+        max-height: inherit;
+        padding: var(--toc-rail-padding);
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        border: 2px solid transparent;
+        scrollbar-width: none;
+        clip-path: inset(
+          calc(-1 * var(--toc-rail-overflow)) var(--toc-rail-clip)
+            calc(-1 * var(--toc-rail-overflow))
+            calc(-1 * var(--toc-rail-overflow))
+        );
+        pointer-events: auto;
+        transition:
+          --toc-rail-clip 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+          background-color 0.18s ease,
+          border-color 0.18s ease,
+          box-shadow 0.18s ease;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
+      a {
+        --toc-tick: 0.625rem;
+
+        display: grid;
+        grid-template-columns: var(--toc-rail-column) minmax(0, 1fr);
+        align-items: center;
+        column-gap: var(--space-2xs);
+        height: var(--toc-rail-row);
+        overflow: hidden;
+        color: var(--muted-foreground);
+        text-decoration: none;
+        transition:
+          height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+          color 0.18s ease;
+
+        &::before {
+          content: "";
+          inline-size: var(--toc-tick);
+          block-size: 2px;
+          border-radius: var(--radius-full);
+          background: currentColor;
+          opacity: 0.45;
+          transition: opacity 0.18s ease;
+        }
+
+        &:hover,
+        &[data-active] {
+          color: var(--foreground);
+
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+
+      li[data-depth="1"] a,
+      li[data-depth="4"] a {
+        --toc-tick: 1.25rem;
+      }
+
+      li[data-depth="3"] a {
+        --toc-tick: 0.9375rem;
+      }
+
+      [data-toc-label] {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        opacity: 0;
+        padding-inline-start: calc(
+          var(--toc-label-indent, 0) *
+          var(--space-xs)
+        );
+        transition: opacity 0.16s ease;
+      }
+
+      li[data-indent="1"] {
+        --toc-label-indent: 1;
+      }
+
+      li[data-indent="2"] {
+        --toc-label-indent: 2;
+      }
+
+      li[data-indent="3"] {
+        --toc-label-indent: 3;
+      }
+
+      &:hover > ul,
+      &:focus-within > ul {
+        --toc-rail-clip: calc(-1 * var(--toc-rail-overflow));
+
+        width: max-content;
+        border-color: var(--border);
+        background: var(--background);
+        box-shadow: 0 16px 32px color-mix(in oklab, black 20%, transparent);
+
+        a {
+          height: var(--toc-rail-open-row);
+        }
+
+        [data-toc-label] {
+          opacity: 1;
+        }
+      }
+
+      &[data-edge] {
+        inset-inline-start: calc(12px - var(--toc-rail-padding) - 2px);
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-toc-rail] > ul,
+    [data-toc-rail] a,
+    [data-toc-label] {
+      transition-duration: 0.01ms;
+    }
   }
 </style>
 
 <script>
   import { hashId } from "@/lib/utils"
 
-  ;(() => {
-    const nav = document.querySelector<HTMLElement>("page-toc nav")
-    if (!nav) return
-
-    const ring = nav.querySelector<SVGElement>("label svg")
+  const nav = document.querySelector<HTMLElement>("nav[data-toc]")
+  if (nav) {
     const mobile = matchMedia("(width < 64rem)")
+    const ring = nav.querySelector<SVGElement>("[data-mobile-toggle] svg")
+    const mobilePanel = nav.querySelector<HTMLElement>("[data-mobile-panel]")
+    const rail = nav.querySelector<HTMLElement>("[data-toc-rail]")
+    const railList = rail?.querySelector<HTMLElement>(":scope > ul")
+    const currentLabel = nav.querySelector("toc-current")
+    const toggle = nav.querySelector<HTMLButtonElement>("[data-mobile-toggle]")
+    const articles = document.querySelectorAll("main article")
+
     const progress = () => {
       if (!ring || !mobile.matches) return
-      const max = document.documentElement.scrollHeight - innerHeight
+      const maximum = document.documentElement.scrollHeight - innerHeight
       ring.style.setProperty(
         "--progress",
-        String(max > 0 ? Math.min(scrollY / max, 1) : 0),
+        String(maximum > 0 ? Math.min(scrollY / maximum, 1) : 0),
       )
     }
-    addEventListener("scroll", progress, { passive: true })
-    mobile.addEventListener("change", progress)
-    progress()
 
-    const seen = new Map<string, number>()
-    const links = new Map<Element, HTMLAnchorElement>()
-    for (const a of nav.querySelectorAll<HTMLAnchorElement>("a[href^='#']")) {
-      const id = hashId(a.hash)
-      const nth = seen.get(id) ?? 0
-      seen.set(id, nth + 1)
-      const target = document.querySelectorAll(`[id="${CSS.escape(id)}"]`)[nth]
-      if (target) links.set(target, a)
-    }
-    const articles = document.querySelectorAll("main article")
-    const list = nav.querySelector(":scope > ul")
-    const title = nav.querySelector("toc-title")
-    const currentLabel = nav.querySelector("toc-current")
-    const toggle = nav.querySelector<HTMLInputElement>("input")
-    const heading = document.querySelector("article > header h1")
-    if (articles.length === 0 || !list || links.size === 0) return
-
-    const fallback = currentLabel?.textContent ?? ""
-
-    const scrollPaddingTop =
-      Number.parseFloat(
-        getComputedStyle(document.documentElement).scrollPaddingBlockStart,
-      ) || 0
-
-    const groups = [
-      ...nav.querySelectorAll<HTMLDetailsElement>("li[data-group] details"),
-    ].map((details) => ({
-      details,
-      active: details.open,
-      anchors: [...details.querySelectorAll<HTMLAnchorElement>("a[href^='#']")],
-    }))
-
-    const blockOf = new Map<Element, Element>()
-    for (const target of links.keys()) {
-      const block = target.closest("prose-content > *, article[data-url]")
-      if (block && !blockOf.has(block)) blockOf.set(block, target)
-    }
-
-    const sectionOf = new Map<Element, Element>()
-    for (const article of articles) {
-      let current = blockOf.get(article)
-      for (const child of article.children) {
-        if (child.tagName === "PROSE-CONTENT") {
-          for (const block of child.children) {
-            current = blockOf.get(block) ?? current
-            if (current) sectionOf.set(block, current)
-          }
-        } else if (current) sectionOf.set(child, current)
+    const targetLinks = new Map<Element, HTMLAnchorElement[]>()
+    for (const list of nav.querySelectorAll<HTMLElement>(
+      "[data-mobile-panel] > ul, [data-toc-rail] > ul",
+    )) {
+      const seen = new Map<string, number>()
+      for (const link of list.querySelectorAll<HTMLAnchorElement>(
+        "a[href^='#']",
+      )) {
+        const id = hashId(link.hash)
+        const occurrence = seen.get(id) ?? 0
+        seen.set(id, occurrence + 1)
+        const target = document.querySelectorAll(`[id="${CSS.escape(id)}"]`)[
+          occurrence
+        ]
+        if (!target) continue
+        const links = targetLinks.get(target)
+        if (links) links.push(link)
+        else targetLinks.set(target, [link])
       }
     }
 
-    const visible = new Set<Element>()
-    let prevActive = new Set<Element>()
+    const blockTargets = new Map<Element, Element>()
+    for (const target of targetLinks.keys()) {
+      const block = target.closest("prose-content > *, article[data-url]")
+      if (block && !blockTargets.has(block)) blockTargets.set(block, target)
+    }
 
-    const center = () => {
-      const run = [
+    const sectionTargets = new Map<Element, Element>()
+    for (const article of articles) {
+      let current = blockTargets.get(article)
+      for (const child of article.children) {
+        if (child.tagName === "PROSE-CONTENT") {
+          for (const block of child.children) {
+            current = blockTargets.get(block) ?? current
+            if (current) sectionTargets.set(block, current)
+          }
+        } else if (current) sectionTargets.set(child, current)
+      }
+    }
+
+    const centerList = (list: HTMLElement | null | undefined) => {
+      if (!list?.checkVisibility()) return
+      const active = [
         ...list.querySelectorAll<HTMLAnchorElement>("a[data-active]"),
       ]
-      const first = run[0]
-      const last = run[run.length - 1]
-      if (!first || !run.every((a) => a.checkVisibility())) return
+      const first = active[0]
+      const last = active.at(-1)
+      if (!first || !last) return
       const area = list.getBoundingClientRect()
-      const runCenter =
+      const midpoint =
         (first.getBoundingClientRect().top +
           last.getBoundingClientRect().bottom) /
         2
       list.scrollTo({
-        top: list.scrollTop + runCenter - (area.top + area.height / 2),
+        top: list.scrollTop + midpoint - (area.top + area.height / 2),
       })
     }
 
-    toggle?.addEventListener("change", () => {
-      if (toggle.checked) center()
-    })
-    list.addEventListener("click", (event) => {
-      if (toggle && (event.target as Element).closest?.("a")) {
-        toggle.checked = false
-      }
-    })
-
-    const observerOptions = {
-      rootMargin: `-${scrollPaddingTop}px 0px 0px`,
+    const setMobileOpen = (open: boolean) => {
+      if (!toggle || !mobilePanel) return
+      toggle.setAttribute("aria-expanded", String(open))
+      mobilePanel.hidden = !open
+      if (open) centerList(mobilePanel)
     }
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === heading) {
-          const past = !entry.isIntersecting
-          title?.toggleAttribute("data-visible", past)
-        } else if (entry.isIntersecting) visible.add(entry.target)
-        else visible.delete(entry.target)
-      }
 
-      const activeTargets = new Set<Element>()
-      for (const block of visible) {
-        const target = sectionOf.get(block)
-        if (target) activeTargets.add(target)
-      }
+    toggle?.addEventListener("click", () => {
+      setMobileOpen(toggle.getAttribute("aria-expanded") !== "true")
+    })
+    mobilePanel?.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) setMobileOpen(false)
+    })
 
-      let firstActive: HTMLAnchorElement | undefined
-      for (const [target, link] of links) {
-        const on = activeTargets.has(target)
-        link.toggleAttribute("data-active", on)
-        link.removeAttribute("aria-current")
-        if (on) firstActive ??= link
-      }
-      firstActive?.setAttribute("aria-current", "location")
-
-      if (currentLabel) {
-        const label = firstActive?.textContent?.trim() || fallback
-        if (currentLabel.textContent !== label) currentLabel.textContent = label
-      }
-
-      for (const group of groups) {
-        const active = group.anchors.some((a) => a.hasAttribute("data-active"))
-        if (active !== group.active) {
-          group.active = active
-          if (active) group.details.open = true
+    const visible = new Set<Element>()
+    const fallback = currentLabel?.textContent ?? ""
+    const scrollPadding =
+      Number.parseFloat(
+        getComputedStyle(document.documentElement).scrollPaddingBlockStart,
+      ) || 0
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target)
+          else visible.delete(entry.target)
         }
-      }
 
-      let grew = false
-      for (const target of activeTargets) {
-        if (!prevActive.has(target)) {
-          grew = true
-          break
+        const activeTargets = new Set<Element>()
+        for (const block of visible) {
+          const target = sectionTargets.get(block)
+          if (target) activeTargets.add(target)
         }
-      }
-      prevActive = activeTargets
-      if (grew) center()
-    }, observerOptions)
 
-    for (const block of sectionOf.keys()) observer.observe(block)
-    if (heading) {
-      observer.observe(heading)
-    } else {
-      title?.toggleAttribute("data-visible", true)
+        let firstActive: HTMLAnchorElement | undefined
+        for (const [target, links] of targetLinks) {
+          const active = activeTargets.has(target)
+          for (const link of links) {
+            link.toggleAttribute("data-active", active)
+            link.removeAttribute("aria-current")
+            if (active && !firstActive && link.checkVisibility())
+              firstActive = link
+          }
+        }
+        firstActive?.setAttribute("aria-current", "location")
+        if (currentLabel) {
+          currentLabel.textContent =
+            firstActive?.textContent?.trim() || fallback
+        }
+        centerList(mobilePanel)
+        centerList(railList)
+      },
+      { rootMargin: `-${scrollPadding}px 0px 0px` },
+    )
+    for (const block of sectionTargets.keys()) observer.observe(block)
+
+    const updateRailEdge = () => {
+      if (!rail || mobile.matches) {
+        rail?.removeAttribute("data-edge")
+        return
+      }
+      const navigation = document.querySelector(
+        "page-nav sidebar-inner > nav > ul",
+      )
+      const actions = document.querySelector("page-nav sidebar-toggle")
+      if (!navigation || !actions) return
+      const box = rail.getBoundingClientRect()
+      const upper = navigation.getBoundingClientRect().bottom + 8
+      const lower = actions.getBoundingClientRect().top - 8
+      rail.toggleAttribute("data-edge", box.top < upper || box.bottom > lower)
     }
-  })()
+
+    const railResize = new ResizeObserver(updateRailEdge)
+    const sidebar = document.querySelector("page-nav aside")
+    if (sidebar) railResize.observe(sidebar)
+    railResize.observe(document.documentElement)
+    addEventListener("scroll", progress, { passive: true })
+    addEventListener("resize", updateRailEdge, { passive: true })
+    mobile.addEventListener("change", () => {
+      if (!mobile.matches) setMobileOpen(false)
+      progress()
+      updateRailEdge()
+    })
+    progress()
+    updateRailEdge()
+  }
 </script>

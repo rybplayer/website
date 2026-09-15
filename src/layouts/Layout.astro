@@ -10,6 +10,7 @@ import "@/styles/typography-block.css"
 import "@/styles/typography-tables.css"
 import "@/styles/typography-math.css"
 import "@/styles/callout.css"
+import "@/styles/sidenotes.css"
 import "@/styles/layout.css"
 import "@/styles/icon-button.css"
 import "@/styles/bar.css"
@@ -18,11 +19,15 @@ import "@/styles/shape.css"
 import Footer from "@/components/Footer.astro"
 import MetaHead from "@/components/MetaHead.astro"
 import Sidebar from "@/components/Sidebar.astro"
+import Sidenotes from "@/components/Sidenotes.astro"
 import { SITE } from "@/consts"
 
-type Props = { crumbs?: { label: string; href: string }[] }
+type Props = {
+  crumbs?: { label: string; href: string }[]
+  sidenotes?: boolean
+}
 
-const { crumbs } = Astro.props
+const { crumbs, sidenotes = false } = Astro.props
 const hasToc = Astro.slots.has("toc")
 ---
 
@@ -47,6 +52,7 @@ const hasToc = Astro.slots.has("toc")
         <page-footer><Footer /></page-footer>
       </page-content>
     </page-grid>
+    {sidenotes && <Sidenotes />}
   </body>
 </html>
 
@@ -179,7 +185,7 @@ const hasToc = Astro.slots.has("toc")
   }
 
   @media (width >= 64rem) {
-    page-grid:not([data-toc]) page-content {
+    page-grid:not([data-toc], :has(prose-content .footnotes)) page-content {
       grid-column: 3 / 13;
       max-inline-size: calc(
         7 *
@@ -190,3 +196,34 @@ const hasToc = Astro.slots.has("toc")
     }
   }
 </style>
+
+<script>
+  for (const spoiler of document.querySelectorAll<HTMLElement>(
+    ".spoiler:not([data-ready])",
+  )) {
+    spoiler.dataset.ready = ""
+    const toggle = () => {
+      const revealed = spoiler.toggleAttribute("data-revealed")
+      spoiler.setAttribute("aria-pressed", String(revealed))
+      spoiler.setAttribute(
+        "aria-label",
+        revealed ? "Hide spoiler" : "Reveal spoiler",
+      )
+    }
+    spoiler.addEventListener("click", () => {
+      const selection = getSelection()
+      if (
+        selection &&
+        !selection.isCollapsed &&
+        selection.containsNode(spoiler, true)
+      )
+        return
+      toggle()
+    })
+    spoiler.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return
+      event.preventDefault()
+      toggle()
+    })
+  }
+</script>

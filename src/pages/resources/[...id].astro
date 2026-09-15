@@ -5,7 +5,13 @@ import ScrollToTop from "@/components/ScrollToTop.astro"
 import SeriesReader from "@/components/SeriesReader.astro"
 import TableOfContents from "@/components/TableOfContents.astro"
 import Layout from "@/layouts/Layout.astro"
-import { getArticles, getSeries, pageTitle, readingTime } from "@/lib/content"
+import {
+  getArticles,
+  getSeries,
+  pageTitle,
+  readingTime,
+  tocHeadings,
+} from "@/lib/content"
 import { formatDate, isSubpost, subpostSlug } from "@/lib/utils"
 import { Image } from "astro:assets"
 import { getEntries, render, type CollectionEntry } from "astro:content"
@@ -47,18 +53,14 @@ const sections = rendered.map(({ entry, headings }, index) => ({
   id: index === 0 ? undefined : subpostSlug(entry.id),
   label: entry.data.title,
   open: entry.id === resource.id,
-  headings: headings.filter(
-    ({ depth, text }) => depth >= 1 && depth <= 6 && text.trim(),
-  ),
+  headings: tocHeadings(headings),
 }))
 const hasToc =
   sections.length > 1 || sections.some(({ headings }) => headings.length > 0)
 const crumbs = [{ label: parent.data.title, href: `/resources/${parent.id}` }]
-if (isSubpost(resource.id))
-  crumbs.push({ label: resource.data.title, href: `/resources/${resource.id}` })
 ---
 
-<Layout crumbs={crumbs}>
+<Layout crumbs={crumbs} sidenotes>
   <MetaPost
     slot="head"
     post={resource}

@@ -1,4 +1,4 @@
-prose-content {
+:is(prose-content, :where(.sidenote-body)) {
   a {
     --underline: color-mix(in oklab, currentColor 55%, transparent);
     color: inherit;

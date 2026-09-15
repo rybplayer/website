@@ -1,4 +1,4 @@
-prose-content {
+:is(prose-content, :where(.sidenote-body)) {
   table {
     --table-border: color-mix(
       in oklab,

@@ -1,0 +1,31 @@
+---
+title: 'Sidenote fixture'
+description: 'Build-only fixture for rich, colliding margin notes.'
+date: 2026-09-02
+tags: ['fixture']
+authors: ['ryan-batubara']
+draft: true
+---
+
+import ColorSwatches from '@/components/ColorSwatches.astro'
+
+## Rich footnotes
+
+Two nearby references exercise collision handling.[^short][^rich]
+
+Another paragraph gives the table of contents an additional target and exercises a repeated reference.[^short]
+
+### Media
+
+The rich note includes styled prose, a component, and an image.
+
+[^short]: A **styled** note with [a link](https://example.com) and `inline code`.
+
+[^rich]:
+    A rich note with a rendered Astro component:
+
+    <ColorSwatches theme="light" />
+
+    And a locally served image:
+
+    ![Ryan Batubara](/static/profile_picture.webp)

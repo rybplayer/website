@@ -1,0 +1,51 @@
+---
+import TableOfContents from "@/components/TableOfContents.astro"
+import Layout from "@/layouts/Layout.astro"
+import { tocHeadings } from "@/lib/content"
+import { render, type CollectionEntry } from "astro:content"
+
+export async function getStaticPaths() {
+  if (process.env.SITE_TEST_FIXTURES !== "1") return []
+  const { getEntry } = await import("astro:content")
+  const fixtures = await Promise.all([
+    getEntry("blog", "sidenotes-fixture"),
+    getEntry("blog", "sidenotes-markdown-fixture"),
+  ])
+  return fixtures.flatMap((entry) =>
+    entry
+      ? [
+          {
+            params: {
+              fixture:
+                entry.id === "sidenotes-fixture"
+                  ? "sidenotes"
+                  : "sidenotes-markdown",
+            },
+            props: { entry },
+          },
+        ]
+      : [],
+  )
+}
+
+type Props = { entry: CollectionEntry<"blog"> }
+const { entry } = Astro.props
+const { Content, headings } = await render(entry)
+const sections = [
+  {
+    label: entry.data.title,
+    headings: tocHeadings(headings),
+  },
+]
+---
+
+<Layout
+  crumbs={[{ label: entry.data.title, href: Astro.url.pathname }]}
+  sidenotes
+>
+  <TableOfContents slot="toc" title={entry.data.title} sections={sections} />
+  <article data-url={Astro.url.pathname}>
+    <header><h1>{entry.data.title}</h1></header>
+    <prose-content><Content /></prose-content>
+  </article>
+</Layout>

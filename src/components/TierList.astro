@@ -1,0 +1,254 @@
+---
+import type { ImageMetadata } from "astro"
+
+export type TierListItem =
+  | string
+  | {
+      title: string
+      image?: ImageMetadata | string
+      href?: string
+      alt?: string
+    }
+
+export type Tiers = Record<string, TierListItem[]>
+
+type Props = {
+  tiers: Tiers
+  labelWidth?: string
+  itemWidth?: string
+  imageRatio?: string
+}
+
+const {
+  tiers,
+  labelWidth = "4.5rem",
+  itemWidth = "5.5rem",
+  imageRatio = "2 / 3",
+} = Astro.props
+
+const tierEntries = Object.entries(tiers)
+
+const normalizeItem = (item: TierListItem) =>
+  typeof item === "string" ? { title: item } : item
+const imageSource = (image: ImageMetadata | string) =>
+  typeof image === "string" ? image : image.src
+---
+
+<tier-list
+  style={`--tier-label-width:${labelWidth};--tier-item-width:${itemWidth};--tier-image-ratio:${imageRatio}`}
+>
+  <table>
+    <tbody>
+      {tierEntries.map(([name, items]) => (
+        <tr>
+          <th scope="row"><span>{name}</span></th>
+          <td>
+            {items.length > 0 ? (
+              <div class="tier-items">
+                {items.map((sourceItem) => {
+                  const item = normalizeItem(sourceItem)
+                  const cover = (
+                    <figure>
+                      {item.image ? (
+                        <img
+                          src={imageSource(item.image)}
+                          alt={item.alt ?? ""}
+                          width={typeof item.image === "string" ? undefined : item.image.width}
+                          height={typeof item.image === "string" ? undefined : item.image.height}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <span class="cover-placeholder">{item.title}</span>
+                      )}
+                      {item.image && <figcaption>{item.title}</figcaption>}
+                    </figure>
+                  )
+
+                  return item.href ? (
+                    <a href={item.href} aria-label={item.title}>{cover}</a>
+                  ) : (
+                    <div class="tier-item">{cover}</div>
+                  )
+                })}
+              </div>
+            ) : (
+              <span class="empty-tier">Unranked</span>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</tier-list>
+
+<style>
+  tier-list {
+    --tier-body-background: var(--site-block-code-background);
+
+    display: block;
+    inline-size: 100%;
+    margin-block: var(--space-m);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--site-block-code-background);
+    box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+
+  table {
+    display: table;
+    inline-size: 100%;
+    max-inline-size: none;
+    margin: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: var(--step--1);
+  }
+
+  tr + tr {
+    border-block-start: 1px solid var(--border);
+  }
+
+  th,
+  td {
+    min-inline-size: 0;
+    max-inline-size: none;
+    padding: 0;
+    border: 0;
+    vertical-align: stretch;
+  }
+
+  th {
+    inline-size: var(--tier-label-width);
+    color: var(--foreground);
+    background: var(--tier-body-background);
+    text-align: center;
+  }
+
+  th > span {
+    display: grid;
+    min-block-size: var(--tier-label-width);
+    padding: var(--space-2xs);
+    place-items: center;
+    overflow-wrap: anywhere;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.15;
+  }
+
+  td {
+    padding: var(--space-2xs);
+    color: var(--foreground);
+    background: var(--tier-body-background);
+  }
+
+  .tier-items {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, var(--tier-item-width)), 1fr)
+      );
+    gap: var(--space-2xs);
+  }
+
+  :is(.tier-item, a) {
+    min-inline-size: 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  figure {
+    position: relative;
+    display: flex;
+    block-size: 100%;
+    margin: 0;
+    overflow: hidden;
+    flex-direction: column;
+    border: 1px solid color-mix(in oklab, var(--border) 80%, var(--primary));
+    border-radius: var(--radius-md);
+    background: var(--background);
+    transition: border-color 0.18s ease;
+  }
+
+  figure::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border: 1px solid transparent;
+    border-radius: inherit;
+    pointer-events: none;
+    transition: border-color 0.18s ease;
+  }
+
+  a:hover figure {
+    border-color: var(--primary);
+  }
+
+  a:hover figure::after {
+    border-color: var(--primary);
+  }
+
+  img,
+  .cover-placeholder {
+    inline-size: 100%;
+    aspect-ratio: var(--tier-image-ratio);
+  }
+
+  img {
+    display: block;
+    min-inline-size: 100%;
+    max-inline-size: none;
+    margin: 0;
+    object-fit: cover;
+    background: var(--muted);
+  }
+
+  .cover-placeholder {
+    box-sizing: border-box;
+    display: grid;
+    padding: var(--space-2xs);
+    place-items: center;
+    color: var(--secondary-foreground);
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--secondary) 88%, transparent),
+      color-mix(in oklab, var(--muted) 78%, transparent)
+    );
+    font-size: var(--font-size-subtext);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  figcaption {
+    display: grid;
+    flex: 1;
+    padding: var(--space-3xs) var(--space-2xs);
+    place-items: center;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-subtext);
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .empty-tier {
+    display: grid;
+    min-block-size: var(--tier-label-width);
+    place-items: center start;
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+
+  @media (width < 32rem) {
+    th > span {
+      padding-inline: var(--space-3xs);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    figure {
+      transition-duration: 0.01ms;
+    }
+  }
+</style>

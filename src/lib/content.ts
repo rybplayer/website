@@ -1,5 +1,6 @@
 import { SITE } from "@/consts"
 import { isSubpost } from "@/lib/utils"
+import type { MarkdownHeading } from "astro"
 import { getCollection, type CollectionEntry } from "astro:content"
 
 export type ArticleCollection = "blog" | "resources"
@@ -36,6 +37,12 @@ export async function getSeries<C extends ArticleCollection>(
 }
 
 export const getSubposts = () => getSeries("blog")
+
+export const tocHeadings = (headings: MarkdownHeading[]) =>
+  headings.filter(
+    ({ depth, slug, text }) =>
+      depth >= 1 && depth <= 6 && slug !== "footnote-label" && text.trim(),
+  )
 
 export async function getTags(): Promise<
   Map<string, CollectionEntry<"blog">[]>

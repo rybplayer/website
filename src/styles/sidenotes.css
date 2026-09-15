@@ -1,0 +1,219 @@
+:root {
+  --sidenote-text-size: var(--font-size-subtext);
+  --sidenote-text-color: var(--muted-foreground);
+  --sidenote-active-text-color: var(--foreground);
+  --sidenote-number-size: 0.75rem;
+  --sidenote-number-color: var(--muted-foreground);
+  --sidenote-active-number-color: var(--primary-foreground);
+  --sidenote-active-number-fill: var(--primary);
+  --sidenote-focus-outline-color: var(--ring);
+  --sidenote-focus-outline-width: 2px;
+  --sidenote-focus-outline-offset: 2px;
+  --sidenote-number-radius: var(--radius-sm);
+  --sidenote-number-block-size: 1.16em;
+  --sidenote-number-padding-inline: 0.2em;
+}
+
+.sidenote-layer {
+  --sidenote-gap: 8px;
+  --sidenote-preview-height: 72px;
+
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media screen and (width >= 64rem) {
+  .sidenote-layer {
+    position: fixed;
+    inset-block: var(--page-offset-top) var(--page-offset-bottom);
+    inset-inline-end: var(--grid-edge);
+    z-index: 10;
+    display: block;
+    width: calc(3 * var(--grid-column-width) + 2 * var(--grid-gutter));
+    pointer-events: none;
+  }
+
+  .sidenote {
+    --sidenote-fill: var(--background);
+
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    display: grid;
+    grid-template-columns: 1.5em minmax(0, 1fr);
+    padding-block: var(--space-2xs);
+    color: var(--sidenote-text-color);
+    background: var(--sidenote-fill);
+    font-size: var(--sidenote-text-size);
+    line-height: calc(var(--leading-offset) + 1em);
+    visibility: hidden;
+    clip-path: inset(-1lh -2rem var(--sidenote-clip, -1lh) -2rem);
+    transition:
+      color 0.18s ease,
+      opacity 0.18s ease;
+
+    &[data-visible] {
+      visibility: visible;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    &[data-highlighted] {
+      color: var(--sidenote-active-text-color);
+    }
+
+    &[data-expanded] {
+      z-index: 2;
+      color: var(--sidenote-active-text-color);
+      clip-path: inset(-1lh -2rem);
+      box-shadow: 0 0 0 0.5rem var(--sidenote-fill);
+
+      .sidenote-marker {
+        border-radius: var(--sidenote-number-radius);
+        color: var(--sidenote-active-number-color);
+        background: var(--sidenote-active-number-fill);
+      }
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      inset-block-start: calc(
+        100% - var(--sidenote-clip, 0px) - 1lh
+      );
+      z-index: 1;
+      display: none;
+      block-size: 1lh;
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        var(--sidenote-fill),
+        transparent
+      );
+    }
+
+    &[data-clipped]::after {
+      display: block;
+    }
+  }
+
+  .sidenote-layer[data-has-expanded]
+    .sidenote:not([data-expanded], [data-highlighted]) {
+    opacity: 0.42;
+  }
+
+  .sidenote-marker {
+    align-self: start;
+    justify-self: start;
+    align-items: center;
+    justify-content: center;
+    display: inline-flex;
+    inline-size: fit-content;
+    block-size: var(--sidenote-number-block-size);
+    padding-inline: var(--sidenote-number-padding-inline);
+    border: 0;
+    color: var(--sidenote-number-color);
+    background: transparent;
+    font: inherit;
+    font-size: var(--sidenote-number-size);
+    line-height: 1;
+    text-align: start;
+    cursor: pointer;
+    translate: 0 0.15em;
+
+    &:focus-visible {
+      outline: var(--sidenote-focus-outline-width) solid
+        var(--sidenote-focus-outline-color);
+      outline-offset: var(--sidenote-focus-outline-offset);
+      border-radius: var(--sidenote-number-radius);
+    }
+  }
+
+  .sidenote-body {
+    min-inline-size: 0;
+    color: inherit;
+    font-size: var(--sidenote-text-size);
+    overflow-wrap: anywhere;
+
+    :is(p, li) {
+      color: inherit;
+    }
+
+    > * {
+      max-inline-size: 100%;
+    }
+  }
+
+  .sidenote[data-expanded] .sidenote-body {
+    max-block-size: calc(
+      100svh - var(--page-offset-top) - var(--page-offset-bottom) -
+        2 * var(--space-2xs)
+    );
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sidenote-layer[data-animating] .sidenote {
+      transition:
+        translate 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        clip-path 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        color 0.18s ease,
+        opacity 0.18s ease;
+    }
+  }
+}
+
+:root[data-sidenotes] prose-content [data-footnote-ref] {
+  --underline: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline: -0.2em;
+  inline-size: fit-content;
+  block-size: var(--sidenote-number-block-size);
+  padding-inline: var(--sidenote-number-padding-inline);
+  border-radius: var(--sidenote-number-radius);
+  color: var(--sidenote-number-color);
+  background: transparent;
+  font-size: var(--sidenote-number-size);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    outline-color 0.18s ease;
+}
+
+:root[data-sidenotes] prose-content [data-footnote-ref][data-highlighted] {
+  color: var(--sidenote-active-number-color);
+}
+
+:root[data-sidenotes] prose-content [data-footnote-ref][data-pinned] {
+  color: var(--sidenote-active-number-color);
+  background: var(--sidenote-active-number-fill);
+}
+
+:root[data-sidenotes] prose-content .footnotes {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

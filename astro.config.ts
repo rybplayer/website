@@ -80,6 +80,7 @@ export default defineConfig({
       filter: (page) =>
         !/\/(blog|resources)\/[^/]+\/[^/]+\/?$/.test(page) &&
         !/\/authors\/[^/]+\/?$/.test(page) &&
+        !page.includes("/fixtures/") &&
         !page.includes("/tags/"),
       serialize: (item) => {
         const lastmod = articleLastmods.get(new URL(item.url).pathname)
