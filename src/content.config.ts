@@ -81,10 +81,21 @@ const publications = defineCollection({
   }),
   schema: z.object({
     title: z.string(),
-    authors: z.array(z.string()),
+    authors: z.array(
+      z.object({
+        name: z.string(),
+        href: z.url().or(z.string().startsWith("/")).optional(),
+      }),
+    ),
     date: z.coerce.date(),
     datePrecision: z.enum(["day", "month", "year"]).optional(),
     description: z.string(),
+    adviser: z
+      .object({
+        name: z.string(),
+        href: z.url(),
+      })
+      .optional(),
     featured: z.boolean().optional(),
     links: z.array(
       z.object({

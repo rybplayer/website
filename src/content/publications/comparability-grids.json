@@ -1,14 +1,23 @@
 {
   "title": "On the Universality of Comparability Grids for Measurement-Based Quantum Computation",
-  "authors": ["Ryan Batubara"],
+  "authors": [{ "name": "Ryan Batubara", "href": "/authors/ryan-batubara" }],
   "date": "2026-06-01",
   "datePrecision": "month",
   "description": "An undergraduate honors thesis presenting several approaches toward proving that comparability grids are universal resources for measurement-based quantum computation.",
+  "adviser": {
+    "name": "Daniel Grier",
+    "href": "https://danielgrier.com"
+  },
   "featured": true,
   "links": [
     {
-      "kind": "paper",
+      "kind": "conference",
+      "label": "Undergrad Honors Thesis",
       "href": "https://math.ucsd.edu/sites/math.ucsd.edu/files/undergrad/honors-program/honors-theses/2025-2026/Batubara%2CRyan_Honors_Thesis.pdf"
+    },
+    {
+      "kind": "paper",
+      "href": "https://github.com/rybplayer/thesis/blob/main/main.pdf"
     },
     {
       "kind": "slides",

@@ -1,6 +1,13 @@
 {
   "title": "K3 surfaces of any Artin–Mazur height over F₅ and F₇ via quasi-F-split singularities and GPU acceleration",
-  "authors": ["Ryan Batubara", "Jack J. Garzella", "Alex Pan"],
+  "authors": [
+    { "name": "Ryan Batubara", "href": "/authors/ryan-batubara" },
+    { "name": "Jack J. Garzella", "href": "https://jjgarzella.github.io/" },
+    {
+      "name": "Alex Pan",
+      "href": "https://www.linkedin.com/in/alex-pan-808499290/"
+    }
+  ],
   "date": "2025-02-18",
   "description": "A fast algorithm for calculating the Artin–Mazur height of Calabi–Yau hypersurfaces, used to construct quartic K3 surfaces of every possible height over F₅ and F₇.",
   "links": [
