@@ -8,6 +8,19 @@ import { SITE, SOCIALS } from "@/consts"
     &copy; {new Date().getFullYear()}
     {SITE.title}
   </p>
+  <nav aria-label="Gathering webring">
+    <a
+      href="https://kytrinh.me/gathering/ryanbatubara/previous"
+      aria-label="Previous site"
+      >&larr;</a
+    >
+    <a href="https://kytrinh.me/gathering"><i>gathering</i></a>
+    <a
+      href="https://kytrinh.me/gathering/ryanbatubara/next"
+      aria-label="Next site"
+      >&rarr;</a
+    >
+  </nav>
   <SocialIcons links={SOCIALS} />
 </footer>
 
@@ -15,17 +28,42 @@ import { SITE, SOCIALS } from "@/consts"
   footer {
     display: flex;
     flex-direction: column;
+    gap: var(--space-3xs);
     align-items: center;
     margin-block: var(--space-xs) var(--page-offset-bottom);
-
-    @media (width >= 40rem) {
-      flex-direction: row;
-      justify-content: space-between;
-    }
+    inline-size: 100%;
 
     p {
       font-size: var(--step--1);
       color: var(--muted-foreground);
+    }
+  }
+
+  @media (width >= 48rem) {
+    footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--space-2xs);
+
+      :global(ul) {
+        justify-self: end;
+      }
+    }
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    font-size: var(--step--1);
+
+    a {
+      color: var(--muted-foreground);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--foreground);
+      }
     }
   }
 </style>
