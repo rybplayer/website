@@ -14,18 +14,18 @@ const cardImage = post.data.image
 
 <li>
   {cardImage && (
-      <a href={`/blog/${post.id}`} tabindex="-1" aria-hidden="true">
+      <a href={`/blog/${post.id}/`} tabindex="-1" aria-hidden="true">
         <Image src={cardImage} alt="" width={640} height={336} />
       </a>
     )}
   <entry-info>
-    <a href={`/blog/${post.id}`}>{post.data.title}</a>
+    <a href={`/blog/${post.id}/`}>{post.data.title}</a>
     <entry-meta>
       {authors.length > 0 && (
           <entry-authors>
             <author-names>
               {authors.map((author, i) => (
-                <>{i > 0 && ", "}<a href={`/authors/${author.id}`}>{author.data.name}</a></>
+                <>{i > 0 && ", "}<a href={`/authors/${author.id}/`}>{author.data.name}</a></>
               ))}
             </author-names>
           </entry-authors>
@@ -37,7 +37,7 @@ const cardImage = post.data.image
       {post.data.tags && (
           <entry-tags>
             {post.data.tags.map((tag) => (
-              <a href={`/tags/${tag}`}>#{tag}</a>
+              <a href={`/tags/${tag}/`}>#{tag}</a>
             ))}
           </entry-tags>
         )}

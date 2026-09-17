@@ -15,11 +15,11 @@ export const SITE = {
 } as const
 
 export const NAVIGATION = [
-  { href: "/blog", label: "Blog" },
-  { href: "/publications", label: "Publications" },
-  { href: "/projects", label: "Projects" },
-  { href: "/talks", label: "Talks" },
-  { href: "/resources", label: "Resources" },
+  { href: "/blog/", label: "Blog" },
+  { href: "/publications/", label: "Publications" },
+  { href: "/projects/", label: "Projects" },
+  { href: "/talks/", label: "Talks" },
+  { href: "/resources/", label: "Resources" },
 ]
 
 export type SocialLink = {

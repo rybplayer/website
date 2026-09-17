@@ -1,6 +1,6 @@
 {
   "title": "On the Universality of Comparability Grids for Measurement-Based Quantum Computation",
-  "authors": [{ "name": "Ryan Batubara", "href": "/authors/ryan-batubara" }],
+  "authors": [{ "name": "Ryan Batubara", "href": "/authors/ryan-batubara/" }],
   "date": "2026-06-01",
   "datePrecision": "month",
   "description": "An undergraduate honors thesis presenting several approaches toward proving that comparability grids are universal resources for measurement-based quantum computation.",

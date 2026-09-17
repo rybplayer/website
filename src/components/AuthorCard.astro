@@ -10,8 +10,8 @@ const { author } = Astro.props
 const { name, pronouns, avatar, bio, socials } = author.data
 const links = getSocialLinks(socials ?? [])
 
-const href = `/authors/${author.id}`
-const isCurrent = normalizePath(Astro.url.pathname) === href
+const href = `/authors/${author.id}/`
+const isCurrent = normalizePath(Astro.url.pathname) === normalizePath(href)
 ---
 
 <li>

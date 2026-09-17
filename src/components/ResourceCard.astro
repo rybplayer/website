@@ -9,7 +9,7 @@ type Props = { resource: CollectionEntry<"resources"> }
 
 const { resource } = Astro.props
 const externalOnly = Boolean(resource.data.link && !resource.body?.trim())
-const href = externalOnly ? resource.data.link! : `/resources/${resource.id}`
+const href = externalOnly ? resource.data.link! : `/resources/${resource.id}/`
 const image = resource.data.previewImage ?? resource.data.image
 ---
 

@@ -57,27 +57,27 @@ const sections = rendered.map(({ entry, headings }, index) => ({
 }))
 const hasToc =
   sections.length > 1 || sections.some(({ headings }) => headings.length > 0)
-const crumbs = [{ label: parent.data.title, href: `/resources/${parent.id}` }]
+const crumbs = [{ label: parent.data.title, href: `/resources/${parent.id}/` }]
 ---
 
 <Layout crumbs={crumbs} sidenotes>
   <MetaPost
     slot="head"
     post={resource}
-    canonical={isSubpost(resource.id) ? `/resources/${parent.id}` : undefined}
+    canonical={isSubpost(resource.id) ? `/resources/${parent.id}/` : undefined}
   />
   {hasToc && <TableOfContents slot="toc" title={parent.data.title} sections={sections} />}
   <PostActions slot="actions" prev={prev} next={next} basePath="/resources" />
   <ScrollToTop floating />
   {rendered.map(({ entry, Content, authors }, index) => (
-    <article id={index === 0 ? undefined : subpostSlug(entry.id)} data-url={`/resources/${entry.id}`} data-title={pageTitle(entry.data.title)} data-embedded={index > 0 || undefined}>
+    <article id={index === 0 ? undefined : subpostSlug(entry.id)} data-url={`/resources/${entry.id}/`} data-title={pageTitle(entry.data.title)} data-embedded={index > 0 || undefined}>
       <header>
         <h1>{entry.data.title}</h1>
         <post-meta>
-          {authors.length > 0 && <span>{authors.map((author, authorIndex) => <>{authorIndex > 0 && ", "}<a href={`/authors/${author.id}`}>{author.data.name}</a></>)}</span>}
+          {authors.length > 0 && <span>{authors.map((author, authorIndex) => <>{authorIndex > 0 && ", "}<a href={`/authors/${author.id}/`}>{author.data.name}</a></>)}</span>}
           <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
           <span>{readingTime(entry)}</span>
-          {entry.data.tags?.map((tag) => <a href={`/tags/${tag}`}>#{tag}</a>)}
+          {entry.data.tags?.map((tag) => <a href={`/tags/${tag}/`}>#{tag}</a>)}
         </post-meta>
         <p>{entry.data.description}</p>
         {entry.data.link && <a class="resource-link" href={entry.data.link}>Open resource ↗</a>}

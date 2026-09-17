@@ -69,6 +69,7 @@ const articleLastmods = await getArticleLastmods()
 
 export default defineConfig({
   site: "https://ryanbatubara.dev",
+  trailingSlash: "always",
   compressHTML: true,
   prefetch: { prefetchAll: true },
   integrations: [

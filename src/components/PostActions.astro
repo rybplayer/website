@@ -16,7 +16,7 @@ const { prev, next, basePath = "/blog" } = Astro.props
 
 <post-actions>
   <a
-    href={prev && `${basePath}/${prev.id}`}
+    href={prev && `${basePath}/${prev.id}/`}
     data-icon-button
     data-dir="prev"
     aria-label={prev && `Previous post: ${prev.data.title}`}
@@ -26,7 +26,7 @@ const { prev, next, basePath = "/blog" } = Astro.props
     <ArrowLeft />
   </a>
   <a
-    href={next && `${basePath}/${next.id}`}
+    href={next && `${basePath}/${next.id}/`}
     data-icon-button
     data-dir="next"
     aria-label={next && `Next post: ${next.data.title}`}
