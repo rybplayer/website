@@ -199,10 +199,12 @@ const section = NAVIGATION.find(
 
     mobile-menu {
       position: absolute;
-      inset-block-start: calc(100% + 2px);
+      inset-block-start: calc(100% + 2px + var(--bar-toc-height));
       inset-inline: 0;
       z-index: 20;
-      max-block-size: calc(100svh - var(--bar-nav-height));
+      max-block-size: calc(
+        100svh - var(--bar-nav-height) - var(--bar-toc-height)
+      );
       padding-block: 0 var(--space-2xs);
       padding-inline: var(--bar-gutter);
       overflow-y: auto;
