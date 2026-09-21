@@ -83,11 +83,11 @@ const section = NAVIGATION.find(
               ))}
         </ul>
       </nav>
-      <sidebar-toggle>
-        <ThemeToggle />
-        <slot name="actions" />
-      </sidebar-toggle>
     </mobile-menu>
+    <sidebar-toggle>
+      <ThemeToggle />
+      <slot name="actions" />
+    </sidebar-toggle>
   </sidebar-inner>
 </aside>
 
@@ -108,6 +108,7 @@ const section = NAVIGATION.find(
     @media (width < 48rem) {
       position: relative;
       height: auto;
+      padding-block: var(--space-3xs);
     }
   }
 
@@ -162,26 +163,31 @@ const section = NAVIGATION.find(
   }
 
   mobile-menu {
-    display: flex;
-    min-height: 0;
-    flex: 1;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--space-s);
+    display: block;
   }
 
   @media (width < 48rem) {
     sidebar-inner {
-      display: block;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 0;
     }
 
     sidebar-brand {
+      display: contents;
+
       > a span {
         display: none;
       }
 
+      > a {
+        grid-column: 1;
+      }
+
       [data-mobile-menu-toggle] {
         display: inline-flex;
+        grid-column: 3;
         margin-inline-end: -0.5rem;
       }
     }
@@ -196,7 +202,7 @@ const section = NAVIGATION.find(
       inset-inline: 0;
       z-index: 20;
       max-block-size: calc(100svh - var(--bar-nav-height));
-      padding-block: var(--space-xs);
+      padding-block: var(--space-2xs);
       padding-inline: var(--bar-gutter);
       overflow-y: auto;
       overscroll-behavior: contain;
@@ -245,7 +251,7 @@ const section = NAVIGATION.find(
       gap: 0;
 
       > li > a {
-        padding-block: var(--space-2xs);
+        padding-block: var(--space-3xs);
         color: var(--foreground);
         font-size: var(--step-0);
       }
@@ -265,13 +271,14 @@ const section = NAVIGATION.find(
   sidebar-toggle {
     display: flex;
     align-items: center;
+    margin-block-start: auto;
     margin-inline-start: -0.5rem;
 
     @media (width < 48rem) {
+      grid-column: 2;
+      grid-row: 1;
       justify-content: flex-end;
-      margin-inline: 0 -0.5rem;
-      padding-block-start: var(--space-2xs);
-      border-block-start: 1px solid var(--border);
+      margin: 0;
     }
   }
 </style>
