@@ -15,71 +15,86 @@ const section = NAVIGATION.find(
 )
 ---
 
-<aside data-bar>
+<aside data-bar data-site-navigation>
   <sidebar-inner>
-    <a href="/" aria-label={SITE.title}>
-      <Logo />
-      <span>{SITE.title}</span>
-    </a>
-    <nav>
-      <ul>
-        {NAVIGATION.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                aria-current={
-                  pathname === normalizePath(item.href) ? "page" : undefined
-                }
-              >
-                {item.label}
-              </a>
-              {item === section &&
-                crumbs.length > 0 &&
-                pathname !== normalizePath(item.href) && (
-                <ul>
-                  {crumbs.map((crumb, i) => (
-                    <li data-depth={i ? 1 : undefined}>
-                      <a
-                        href={crumb.href}
-                        aria-current={
-                          i === crumbs.length - 1 ? "page" : undefined
-                        }
-                      >
-                        {crumb.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        {!section &&
-            crumbs.map((crumb, i) => (
-              <li data-depth={i ? 1 : undefined}>
+    <sidebar-brand>
+      <a href="/" aria-label={SITE.title}>
+        <Logo />
+        <span>{SITE.title}</span>
+      </a>
+      <button
+        type="button"
+        data-mobile-menu-toggle
+        data-icon-button
+        aria-expanded="false"
+        aria-controls="site-navigation-menu"
+        aria-label="Open site navigation"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </sidebar-brand>
+    <mobile-menu id="site-navigation-menu">
+      <nav aria-label="Primary navigation">
+        <ul>
+          {NAVIGATION.map((item) => (
+              <li>
                 <a
-                  href={crumb.href}
-                  aria-current={i === crumbs.length - 1 ? "page" : undefined}
+                  href={item.href}
+                  aria-current={
+                    pathname === normalizePath(item.href) ? "page" : undefined
+                  }
                 >
-                  {crumb.label}
+                  {item.label}
                 </a>
+                {item === section &&
+                  crumbs.length > 0 &&
+                  pathname !== normalizePath(item.href) && (
+                  <ul>
+                    {crumbs.map((crumb, i) => (
+                      <li data-depth={i ? 1 : undefined}>
+                        <a
+                          href={crumb.href}
+                          aria-current={
+                            i === crumbs.length - 1 ? "page" : undefined
+                          }
+                        >
+                          {crumb.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
-      </ul>
-    </nav>
+          {!section &&
+              crumbs.map((crumb, i) => (
+                <li data-depth={i ? 1 : undefined}>
+                  <a
+                    href={crumb.href}
+                    aria-current={
+                      i === crumbs.length - 1 ? "page" : undefined
+                    }
+                  >
+                    {crumb.label}
+                  </a>
+                </li>
+              ))}
+        </ul>
+      </nav>
+      <sidebar-toggle>
+        <ThemeToggle />
+        <slot name="actions" />
+      </sidebar-toggle>
+    </mobile-menu>
   </sidebar-inner>
-  <sidebar-toggle>
-    <ThemeToggle />
-    <slot name="actions" />
-  </sidebar-toggle>
 </aside>
 
 <style>
   aside {
     position: sticky;
     top: var(--page-offset-top);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     height: calc(100svh - var(--page-offset-top) - var(--page-offset-bottom));
 
     @media (width >= 48rem) {
@@ -91,18 +106,22 @@ const section = NAVIGATION.find(
     }
 
     @media (width < 48rem) {
-      position: static;
+      position: relative;
       height: auto;
-      flex-direction: row;
-      align-items: center;
-      gap: var(--space-s);
     }
   }
 
   sidebar-inner {
     display: flex;
+    height: 100%;
     flex-direction: column;
     gap: var(--space-2xs);
+  }
+
+  sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     > a {
       display: inline-flex;
@@ -123,19 +142,71 @@ const section = NAVIGATION.find(
       span {
         white-space: nowrap;
       }
+    }
+  }
 
-      @media (width < 40rem) {
-        span {
-          display: none;
-        }
+  [data-mobile-menu-toggle] {
+    display: none;
+    color: var(--foreground);
+
+    path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      transform-origin: center;
+      transition:
+        rotate 0.18s ease,
+        opacity 0.18s ease;
+    }
+  }
+
+  mobile-menu {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-s);
+  }
+
+  @media (width < 48rem) {
+    sidebar-inner {
+      display: block;
+    }
+
+    sidebar-brand {
+      > a span {
+        display: none;
+      }
+
+      [data-mobile-menu-toggle] {
+        display: inline-flex;
+        margin-inline-end: -0.5rem;
       }
     }
 
-    @media (width < 48rem) {
-      flex: 1;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+    sidebar-inner:not([data-menu-open]) mobile-menu {
+      display: none;
+    }
+
+    mobile-menu {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      z-index: 20;
+      max-block-size: calc(100svh - var(--bar-nav-height));
+      padding-block: var(--space-xs);
+      padding-inline: var(--bar-gutter);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      background-color: color-mix(in oklab, var(--background) 94%, transparent);
+      backdrop-filter: blur(var(--blur-sm));
+      border-block-end: 2px solid var(--border);
+    }
+
+    sidebar-inner[data-menu-open] [data-mobile-menu-toggle] {
+      background-color: color-mix(in oklab, var(--muted) 50%, transparent);
     }
   }
 
@@ -171,9 +242,13 @@ const section = NAVIGATION.find(
     }
 
     @media (width < 48rem) {
-      flex-direction: row;
-      align-items: center;
-      gap: var(--space-s);
+      gap: 0;
+
+      > li > a {
+        padding-block: var(--space-2xs);
+        color: var(--foreground);
+        font-size: var(--step-0);
+      }
 
       ul {
         display: none;
@@ -193,8 +268,57 @@ const section = NAVIGATION.find(
     margin-inline-start: -0.5rem;
 
     @media (width < 48rem) {
-      margin-inline-start: 0;
-      margin-inline-end: -0.5rem;
+      justify-content: flex-end;
+      margin-inline: 0 -0.5rem;
+      padding-block-start: var(--space-2xs);
+      border-block-start: 1px solid var(--border);
     }
   }
 </style>
+
+<script>
+  const sidebar = document.querySelector<HTMLElement>(
+    "[data-site-navigation] sidebar-inner",
+  )
+  const toggle = sidebar?.querySelector<HTMLButtonElement>(
+    "[data-mobile-menu-toggle]",
+  )
+  const menu = sidebar?.querySelector<HTMLElement>("mobile-menu")
+  const mobile = matchMedia("(width < 48rem)")
+
+  const setOpen = (open: boolean) => {
+    if (!sidebar || !toggle) return
+    sidebar.toggleAttribute("data-menu-open", open)
+    toggle.setAttribute("aria-expanded", String(open))
+    toggle.setAttribute(
+      "aria-label",
+      open ? "Close site navigation" : "Open site navigation",
+    )
+  }
+
+  toggle?.addEventListener("click", () => {
+    setOpen(toggle.getAttribute("aria-expanded") !== "true")
+  })
+
+  menu?.addEventListener("click", (event) => {
+    if ((event.target as Element).closest("a")) setOpen(false)
+  })
+
+  document.addEventListener("click", (event) => {
+    if (
+      mobile.matches &&
+      sidebar?.hasAttribute("data-menu-open") &&
+      !(event.target as Element).closest("[data-site-navigation]")
+    )
+      setOpen(false)
+  })
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !sidebar?.hasAttribute("data-menu-open"))
+      return
+    setOpen(false)
+    toggle?.focus()
+  })
+
+  mobile.addEventListener("change", () => setOpen(false))
+</script>

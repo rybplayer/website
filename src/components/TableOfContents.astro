@@ -567,9 +567,7 @@ const { title, sections } = Astro.props
         rail?.removeAttribute("data-edge")
         return
       }
-      const navigation = document.querySelector(
-        "page-nav sidebar-inner > nav > ul",
-      )
+      const navigation = document.querySelector("page-nav nav > ul")
       const actions = document.querySelector("page-nav sidebar-toggle")
       if (!navigation || !actions) return
       const box = rail.getBoundingClientRect()
