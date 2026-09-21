@@ -10,6 +10,7 @@ type Props = { publication: Publication }
 
 const { publication } = Astro.props
 const data = publication.data
+const titleParts = data.title.split(/(-)/u)
 const linkOrder: PublicationLinkKind[] = [
   "conference",
   "paper",
@@ -42,10 +43,10 @@ const isExternal = (href: string) => /^https?:\/\//.test(href)
     <h2>
       {primaryHref ? (
         <a href={primaryHref} target="_blank" rel="noopener noreferrer">
-          {data.title}
+          {titleParts.map((part) => <>{part}{part === "-" && <wbr />}</>)}
         </a>
       ) : (
-        data.title
+        titleParts.map((part) => <>{part}{part === "-" && <wbr />}</>)
       )}
     </h2>
     <publication-meta>
