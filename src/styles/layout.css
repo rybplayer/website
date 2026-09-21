@@ -45,13 +45,17 @@
 
   --page-offset-top: var(--space-xl);
   --page-offset-bottom: var(--space-m);
+
+  @media (width < 24rem) {
+    --grid-gutter: var(--space-xs);
+  }
 }
 
 html {
   scrollbar-gutter: stable;
 
   @media (width < 64rem) {
-    --bar-nav-height: calc(2rem + 2 * var(--space-2xs) + 2px);
+    --bar-nav-height: calc(2rem + 2 * var(--space-3xs) + 2px);
     --bar-toc-height: 0px;
     scroll-padding-block-start: calc(
       var(--bar-nav-height) +
@@ -64,7 +68,4 @@ html {
     }
   }
 
-  @media (width < 48rem) {
-    --bar-nav-height: calc(2rem + 2 * var(--space-3xs) + 2px);
-  }
 }

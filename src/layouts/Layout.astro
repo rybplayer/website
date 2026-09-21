@@ -69,21 +69,10 @@ const hasToc = Astro.slots.has("toc")
     padding-inline: var(--grid-gutter);
     padding-block-start: var(--page-offset-top);
 
-    @media (width >= 48rem) and (width < 64rem) {
-      grid-template-columns:
-        max(calc(2 * var(--grid-column-width) + var(--grid-gutter)), 9rem)
-        minmax(0, 1fr);
-      grid-template-rows: auto 1fr;
-      grid-template-areas: "nav toc" "nav content";
-
-      &:not([data-toc]) {
-        grid-template-areas: "nav content" "nav content";
-      }
-    }
-
-    @media (width < 48rem) {
+    @media (width < 64rem) {
       grid-template-columns: 1fr;
       grid-template-rows: auto 1fr;
+      row-gap: 0;
       padding-block-start: 0;
     }
   }
@@ -91,7 +80,7 @@ const hasToc = Astro.slots.has("toc")
   page-header {
     display: contents;
 
-    @media (width < 48rem) {
+    @media (width < 64rem) {
       display: block;
       grid-column: 1 / -1;
       position: sticky;
@@ -112,14 +101,6 @@ const hasToc = Astro.slots.has("toc")
     grid-column: 1 / 3;
     grid-row: 1;
 
-    @media (width >= 48rem) and (width < 64rem) {
-      grid-area: nav;
-      position: fixed;
-      inset-block: var(--page-offset-top) var(--page-offset-bottom);
-      inset-inline-start: var(--grid-edge);
-      width: max(calc(2 * var(--grid-column-width) + var(--grid-gutter)), 9rem);
-    }
-
     @media screen and (width >= 64rem) {
       position: fixed;
       inset-block: var(--page-offset-top) var(--page-offset-bottom);
@@ -133,19 +114,6 @@ const hasToc = Astro.slots.has("toc")
     min-width: 0;
     grid-column: 10 / 13;
     grid-row: 1;
-
-    @media (width >= 48rem) and (width < 64rem) {
-      grid-area: toc;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      max-inline-size: var(--measure);
-
-      :global([data-bar]) {
-        --bar-border-image: none;
-        padding-inline: 0;
-      }
-    }
 
     @media screen and (width >= 64rem) {
       position: fixed;
@@ -174,13 +142,6 @@ const hasToc = Astro.slots.has("toc")
 
     @media (width < 64rem) {
       max-inline-size: var(--measure);
-    }
-
-    @media (width >= 48rem) and (width < 64rem) {
-      grid-area: content;
-    }
-
-    @media (width < 48rem) {
       grid-column: 1 / -1;
       grid-row: auto;
       inline-size: 100%;
